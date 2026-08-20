@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="theme-color"
+        content="#111827"
+    >
+
+    <title>Subject Management - JNX Attendance</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+
+    <style>
+
+        /* =========================================
+           PROFESSIONAL SUBJECT MANAGEMENT
+           ========================================= */
+
+        body {
+            background:
+                linear-gradient(
+                    135deg,
+                    #f8fafc 0%,
+                    #eef2ff 50%,
+                    #f8fafc 100%
+                );
+            min-height: 100vh;
+        }
+
+
+        .subject-home-button {
+            position: fixed;
+            top: 24px;
+            left: 24px;
+
+            z-index: 1000;
+
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+
+            padding: 11px 17px;
+
+            border-radius: 12px;
+
+            background: rgba(255,255,255,0.96);
+
+            border: 1px solid #e2e8f0;
+
+            color: #0f172a;
+
+            text-decoration: none;
+
+            font-weight: 700;
+
+            box-shadow:
+                0 6px 20px rgba(15,23,42,0.08);
+
+            transition:
+                transform .2s ease,
+                box-shadow .2s ease,
+                background .2s ease;
+        }
+
+
+        .subject-home-button:hover {
+            transform: translateY(-2px);
+
+            background: #ffffff;
+
+            box-shadow:
+                0 10px 28px rgba(15,23,42,0.12);
+        }
+
+
+        .subject-home-icon {
+            display: inline-flex;
+
+            align-items: center;
+            justify-content: center;
+
+            width: 28px;
+            height: 28px;
+
+            border-radius: 8px;
+
+            background: #111827;
+
+            color: white;
+
+            font-size: 17px;
+        }
+
+
+        /* Main dashboard cards */
+
+        .subject-management-item {
+            background: rgba(255,255,255,0.98);
+
+            border: 1px solid #e2e8f0;
+
+            border-radius: 18px;
+
+            padding: 18px 20px;
+
+            margin-bottom: 14px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 20px;
+
+            box-shadow:
+                0 5px 18px rgba(15,23,42,0.05);
+
+            transition:
+                transform .2s ease,
+                box-shadow .2s ease,
+                border-color .2s ease;
+        }
+
+
+        .subject-management-item:hover {
+            transform: translateY(-2px);
+
+            border-color: #cbd5e1;
+
+            box-shadow:
+                0 12px 30px rgba(15,23,42,0.09);
+        }
+
+
+        .management-subject-info {
+            display: flex;
+
+            align-items: center;
+
+            gap: 15px;
+        }
+
+
+        .management-subject-icon {
+            width: 54px;
+            height: 54px;
+
+            flex-shrink: 0;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 15px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #111827,
+                    #334155
+                );
+
+            color: white;
+
+            font-size: 25px;
+
+            box-shadow:
+                0 6px 15px rgba(15,23,42,0.14);
+        }
+
+
+        .management-subject-info strong {
+            display: block;
+
+            color: #0f172a;
+
+            font-size: 16px;
+
+            margin-bottom: 4px;
+        }
+
+
+        .management-subject-info small {
+            display: block;
+
+            color: #64748b;
+
+            font-size: 12px;
+        }
+
+
+        .management-subject-actions {
+            display: flex;
+
+            gap: 8px;
+        }
+
+
+        .management-subject-actions button {
+            border: 0;
+
+            border-radius: 10px;
+
+            padding: 9px 14px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            transition:
+                transform .15s ease,
+                opacity .15s ease;
+        }
+
+
+        .management-subject-actions button:hover {
+            transform: translateY(-1px);
+
+            opacity: .9;
+        }
+
+
+        .edit-subject-button {
+            background: #e2e8f0;
+
+            color: #0f172a;
+        }
+
+
+        .delete-subject-button {
+            background: #fee2e2;
+
+            color: #b91c1c;
+        }
+
+
+        .manage-subject-button {
+            border: 0;
+
+            border-radius: 12px;
+
+            padding: 12px 18px;
+
+            background: #111827;
+
+            color: white;
+
+            font-weight: 800;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 6px 18px rgba(15,23,42,0.15);
+
+            transition:
+                transform .2s ease,
+                box-shadow .2s ease;
+        }
+
+
+        .manage-subject-button:hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 10px 25px rgba(15,23,42,0.20);
+        }
+
+
+        @media (max-width: 700px) {
+
+            .subject-home-button {
+                top: 14px;
+                left: 14px;
+            }
+
+
+            .subject-management-item {
+                align-items: flex-start;
+
+                flex-direction: column;
+            }
+
+
+            .management-subject-actions {
+                width: 100%;
+            }
+
+
+            .management-subject-actions button {
+                flex: 1;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <main class="home-dashboard">
+
+        <header class="dashboard-header">
+
+            <div>
+
+                <div class="dashboard-brand">
+                    JNX
+                </div>
+
+                <h1>
+                    Subject Management
+                </h1>
+
+                <p>
+                    Add, edit, and remove subjects from the attendance system.
+                </p>
+
+            </div>
+
+            <a
+                href="index.html"
+                class="dashboard-back"
+            >
+                ← Home
+            </a>
+
+        </header>
+
+
+        <section class="dashboard-section">
+
+            <div class="dashboard-section-heading">
+
+                <div>
+
+                    <h2>
+                        Subjects
+                    </h2>
+
+                    <p>
+                        Manage the subjects available on the attendance home page.
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="primary-button"
+                    onclick="openSubjectForm()"
+                >
+                    + Add Subject
+                </button>
+
+            </div>
+
+
+            <div
+                id="subjectManagementGrid"
+                class="subject-grid"
+            ></div>
+
+        </section>
+
+
+        <section
+            id="subjectFormSection"
+            class="dashboard-section"
+            style="display:none;"
+        >
+
+            <div class="dashboard-section-heading">
+
+                <div>
+
+                    <h2 id="formTitle">
+                        Add Subject
+                    </h2>
+
+                    <p>
+                        The icon will be generated automatically.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <form
+                id="subjectForm"
+                class="subject-form"
+            >
+
+                <div class="form-group">
+
+                    <label for="subjectName">
+                        Subject Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="subjectName"
+                        required
+                        placeholder="Example: Legal Research"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="subjectCode">
+                        Subject Code
+                    </label>
+
+                    <input
+                        type="text"
+                        id="subjectCode"
+                        required
+                        placeholder="Example: LRES"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Generated Icon
+                    </label>
+
+                    <div
+                        id="iconPreview"
+                        class="generated-icon-preview"
+                    >
+                        📚
+                    </div>
+
+                </div>
+
+
+                <div class="subject-form-actions">
+
+                    <button
+                        type="submit"
+                        class="primary-button"
+                    >
+                        Save Subject
+                    </button>
+
+                    <button
+                        type="button"
+                        class="secondary-button"
+                        onclick="closeSubjectForm()"
+                    >
+                        Cancel
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </main>
+
+
+    <script src="data/subjects.js"></script>
+
+
+    <script>
+
+        let editingSubjectId = null;
+
+
+        /*
+         * =====================================================
+         * AUTOMATIC ICON GENERATOR
+         * =====================================================
+         */
+
+        function generateSubjectIcon(name) {
+
+            const value =
+                String(name || "")
+                    .trim()
+                    .toLowerCase();
+
+
+            if (
+                value.includes("law") ||
+                value.includes("legal") ||
+                value.includes("justice")
+            ) {
+                return "⚖️";
+            }
+
+
+            if (
+                value.includes("research")
+            ) {
+                return "🔎";
+            }
+
+
+            if (
+                value.includes("writing") ||
+                value.includes("english") ||
+                value.includes("language")
+            ) {
+                return "✍️";
+            }
+
+
+            if (
+                value.includes("history")
+            ) {
+                return "🏛️";
+            }
+
+
+            if (
+                value.includes("world") ||
+                value.includes("global")
+            ) {
+                return "🌐";
+            }
+
+
+            if (
+                value.includes("art")
+            ) {
+                return "🎨";
+            }
+
+
+            if (
+                value.includes("business") ||
+                value.includes("management") ||
+                value.includes("marketing")
+            ) {
+                return "💼";
+            }
+
+
+            if (
+                value.includes("econom")
+            ) {
+                return "📈";
+            }
+
+
+            if (
+                value.includes("politic") ||
+                value.includes("government")
+            ) {
+                return "🏛️";
+            }
+
+
+            if (
+                value.includes("science") ||
+                value.includes("biology") ||
+                value.includes("chemistry") ||
+                value.includes("physics")
+            ) {
+                return "🔬";
+            }
+
+
+            if (
+                value.includes("math") ||
+                value.includes("statistics")
+            ) {
+                return "📐";
+            }
+
+
+            if (
+                value.includes("computer") ||
+                value.includes("technology") ||
+                value.includes("programming")
+            ) {
+                return "💻";
+            }
+
+
+            if (
+                value.includes("communication") ||
+                value.includes("speech")
+            ) {
+                return "🎤";
+            }
+
+
+            if (
+                value.includes("physical") ||
+                value.includes("sport")
+            ) {
+                return "🏃";
+            }
+
+
+            if (
+                value.includes("education") ||
+                value.includes("teaching")
+            ) {
+                return "🎓";
+            }
+
+
+            /*
+             * Default icon
+             */
+
+            return "📚";
+
+        }
+
+
+        /*
+         * =====================================================
+         * RENDER SUBJECTS
+         * =====================================================
+         */
+
+        function renderSubjects() {
+
+            const grid =
+                document.getElementById(
+                    "subjectManagementGrid"
+                );
+
+
+            grid.innerHTML = "";
+
+
+            const subjects =
+                loadSubjects();
+
+
+            if (!subjects.length) {
+
+                grid.innerHTML =
+                    "<p>No subjects have been added yet.</p>";
+
+                return;
+
+            }
+
+
+            subjects.forEach(function(subject) {
+
+                const card =
+                    document.createElement("div");
+
+
+                card.className =
+                    "subject-management-card";
+
+
+                card.innerHTML =
+
+                    '<div class="subject-management-icon">' +
+                        (subject.icon || "📚") +
+                    '</div>' +
+
+                    '<div class="subject-management-content">' +
+
+                        '<span class="subject-code">' +
+                            escapeHtml(subject.code) +
+                        '</span>' +
+
+                        '<h3>' +
+                            escapeHtml(subject.name) +
+                        '</h3>' +
+
+                    '</div>' +
+
+                    '<div class="subject-management-actions">' +
+
+                        '<button ' +
+                            'type="button" ' +
+                            'class="secondary-button" ' +
+                            'onclick="editSubject(\'' +
+                                escapeJs(subject.id) +
+                            '\')">' +
+                            'Edit' +
+                        '</button>' +
+
+                        '<button ' +
+                            'type="button" ' +
+                            'class="danger-button" ' +
+                            'onclick="deleteSubject(\'' +
+                                escapeJs(subject.id) +
+                            '\')">' +
+                            'Delete' +
+                        '</button>' +
+
+                    '</div>';
+
+
+                grid.appendChild(card);
+
+            });
+
+        }
+
+
+        /*
+         * =====================================================
+         * OPEN ADD FORM
+         * =====================================================
+         */
+
+        function openSubjectForm() {
+
+            editingSubjectId = null;
+
+
+            document.getElementById(
+                "formTitle"
+            ).textContent =
+                "Add Subject";
+
+
+            document.getElementById(
+                "subjectName"
+            ).value = "";
+
+
+            document.getElementById(
+                "subjectCode"
+            ).value = "";
+
+
+            updateIconPreview();
+
+
+            document.getElementById(
+                "subjectFormSection"
+            ).style.display =
+                "block";
+
+
+            document.getElementById(
+                "subjectName"
+            ).focus();
+
+        }
+
+
+        /*
+         * =====================================================
+         * EDIT SUBJECT
+         * =====================================================
+         */
+
+        function editSubject(id) {
+
+            const subjects =
+                loadSubjects();
+
+
+            const subject =
+                subjects.find(function(item) {
+
+                    return String(item.id) ===
+                        String(id);
+
+                });
+
+
+            if (!subject) {
+                return;
+            }
+
+
+            editingSubjectId =
+                subject.id;
+
+
+            document.getElementById(
+                "formTitle"
+            ).textContent =
+                "Edit Subject";
+
+
+            document.getElementById(
+                "subjectName"
+            ).value =
+                subject.name;
+
+
+            document.getElementById(
+                "subjectCode"
+            ).value =
+                subject.code;
+
+
+            updateIconPreview();
+
+
+            document.getElementById(
+                "subjectFormSection"
+            ).style.display =
+                "block";
+
+
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+
+        }
+
+
+        /*
+         * =====================================================
+         * DELETE SUBJECT
+         * =====================================================
+         */
+
+        function deleteSubject(id) {
+
+            const subjects =
+                loadSubjects();
+
+
+            const subject =
+                subjects.find(function(item) {
+
+                    return String(item.id) ===
+                        String(id);
+
+                });
+
+
+            if (!subject) {
+                return;
+            }
+
+
+            const confirmed =
+                confirm(
+                    "Remove " +
+                    subject.name +
+                    " from the subject list?"
+                );
+
+
+            if (!confirmed) {
+                return;
+            }
+
+
+            const remaining =
+                subjects.filter(function(item) {
+
+                    return String(item.id) !==
+                        String(id);
+
+                });
+
+
+            saveSubjects(remaining);
+
+
+            renderSubjects();
+
+        }
+
+
+        /*
+         * =====================================================
+         * CLOSE FORM
+         * =====================================================
+         */
+
+        function closeSubjectForm() {
+
+            editingSubjectId = null;
+
+
+            document.getElementById(
+                "subjectFormSection"
+            ).style.display =
+                "none";
+
+        }
+
+
+        /*
+         * =====================================================
+         * ICON PREVIEW
+         * =====================================================
+         */
+
+        function updateIconPreview() {
+
+            const name =
+                document.getElementById(
+                    "subjectName"
+                ).value;
+
+
+            document.getElementById(
+                "iconPreview"
+            ).textContent =
+                generateSubjectIcon(name);
+
+        }
+
+
+        document.getElementById(
+            "subjectName"
+        ).addEventListener(
+            "input",
+            updateIconPreview
+        );
+
+
+        /*
+         * =====================================================
+         * SAVE SUBJECT
+         * =====================================================
+         */
+
+        document.getElementById(
+            "subjectForm"
+        ).addEventListener(
+            "submit",
+            function(event) {
+
+                event.preventDefault();
+
+
+                const name =
+                    document.getElementById(
+                        "subjectName"
+                    ).value.trim();
+
+
+                const code =
+                    document.getElementById(
+                        "subjectCode"
+                    ).value.trim()
+                    .toUpperCase();
+
+
+                if (!name || !code) {
+
+                    alert(
+                        "Please complete the subject name and code."
+                    );
+
+                    return;
+
+                }
+
+
+                const subjects =
+                    loadSubjects();
+
+
+                /*
+                 * Generate a URL-safe ID.
+                 */
+
+                const generatedId =
+                    name
+                        .toLowerCase()
+                        .replace(
+                            /[^a-z0-9]+/g,
+                            "-"
+                        )
+                        .replace(
+                            /^-+|-+$/g,
+                            ""
+                        );
+
+
+                /*
+                 * Prevent duplicate names.
+                 */
+
+                const duplicate =
+                    subjects.some(function(item) {
+
+                        return (
+                            String(item.name)
+                                .trim()
+                                .toLowerCase() ===
+                            name.toLowerCase()
+                        ) &&
+                        String(item.id) !==
+                            String(editingSubjectId);
+
+                    });
+
+
+                if (duplicate) {
+
+                    alert(
+                        "That subject already exists."
+                    );
+
+                    return;
+
+                }
+
+
+                const icon =
+                    generateSubjectIcon(name);
+
+
+                if (editingSubjectId) {
+
+                    const index =
+                        subjects.findIndex(
+                            function(item) {
+
+                                return String(item.id) ===
+                                    String(editingSubjectId);
+
+                            }
+                        );
+
+
+                    if (index !== -1) {
+
+                        subjects[index] = {
+
+                            id:
+                                subjects[index].id,
+
+                            name:
+                                name,
+
+                            code:
+                                code,
+
+                            icon:
+                                icon
+
+                        };
+
+                    }
+
+                } else {
+
+                    let id =
+                        generatedId;
+
+
+                    let counter = 2;
+
+
+                    while (
+                        subjects.some(
+                            function(item) {
+
+                                return String(item.id) ===
+                                    String(id);
+
+                            }
+                        )
+                    ) {
+
+                        id =
+                            generatedId +
+                            "-" +
+                            counter;
+
+                        counter++;
+
+                    }
+
+
+                    subjects.push({
+
+                        id:
+                            id,
+
+                        name:
+                            name,
+
+                        code:
+                            code,
+
+                        icon:
+                            icon
+
+                    });
+
+                }
+
+
+                saveSubjects(subjects);
+
+
+                closeSubjectForm();
+
+
+                renderSubjects();
+
+            }
+        );
+
+
+        /*
+         * =====================================================
+         * SECURITY HELPERS
+         * =====================================================
+         */
+
+        function escapeHtml(value) {
+
+            return String(value)
+                .replace(
+                    /&/g,
+                    "&amp;"
+                )
+                .replace(
+                    /</g,
+                    "&lt;"
+                )
+                .replace(
+                    />/g,
+                    "&gt;"
+                )
+                .replace(
+                    /"/g,
+                    "&quot;"
+                )
+                .replace(
+                    /'/g,
+                    "&#039;"
+                );
+
+        }
+
+
+        function escapeJs(value) {
+
+            return String(value)
+                .replace(
+                    /\\/g,
+                    "\\\\"
+                )
+                .replace(
+                    /'/g,
+                    "\\'"
+                );
+
+        }
+
+
+        /*
+         * INITIALIZE
+         */
+
+        renderSubjects();
+
+    </script>
+
+</body>
+
+</html>

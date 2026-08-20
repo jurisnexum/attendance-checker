@@ -708,7 +708,9 @@ function recordStudentAttendance(student) {
     };
 
 
-    addAttendanceRecord(record);
+    attendance.push(record);
+
+    saveAttendance(attendance);
 
     /*
      * SAVE TO GOOGLE SHEETS
@@ -815,45 +817,21 @@ function renderAttendance() {
     const todayRecords =
         attendance.filter(function(record) {
 
-            const recordSubjectCode =
-                String(
-                    record.subjectCode ||
-                    record.subject ||
-                    ""
-                ).trim();
-
-            const currentSubjectCode =
-                String(
-                    CURRENT_SUBJECT.code ||
-                    ""
-                ).trim();
-
-            const recordSubjectName =
-                String(
-                    record.subjectName ||
-                    ""
-                ).trim();
-
-            const currentSubjectName =
-                String(
-                    CURRENT_SUBJECT.name ||
-                    ""
-                ).trim();
-
-            const sameDate =
-                String(record.date || "") ===
-                String(today);
-
-            const sameSubject =
-                recordSubjectCode ===
-                    currentSubjectCode
-                ||
-                recordSubjectName ===
-                    currentSubjectName;
+            const recordSubject =
+                record.subjectCode ||
+                record.subject ||
+                "";
 
             return (
-                sameDate &&
-                sameSubject
+
+                String(record.date) ===
+                String(today)
+
+                &&
+
+                String(recordSubject) ===
+                String(CURRENT_SUBJECT.code)
+
             );
 
         });
@@ -1251,100 +1229,64 @@ async function sendAttendanceToGoogle(record) {
     }
 
 
-    const payload = {
-
-        timestamp:
-            String(
-                record.timestamp || ""
-            ),
-
-        subjectCode:
-            String(
-                record.subjectCode ||
-                record.subject ||
-                ""
-            ),
-
-        subjectName:
-            String(
-                record.subjectName || ""
-            ),
-
-        studentNumber:
-            String(
-                record.studentNumber || ""
-            ),
-
-        name:
-            String(
-                record.name || ""
-            ),
-
-        year:
-            String(
-                record.year || ""
-            ),
-
-        section:
-            String(
-                record.section || ""
-            ),
-
-        date:
-            String(
-                record.date || ""
-            ),
-
-        time:
-            String(
-                record.time || ""
-            ),
-
-        status:
-            String(
-                record.status ||
-                "PRESENT"
-            )
-
-    };
-
-
-    console.log(
-        "Sending attendance to Google Sheets:",
-        payload
-    );
-
-
     const response =
         await fetch(
             GOOGLE_SHEETS_URL,
             {
+                method: "POST",
 
-                method:
-                    "POST",
-
-                mode:
-                    "no-cors",
+                mode: "no-cors",
 
                 headers: {
-
                     "Content-Type":
                         "text/plain;charset=utf-8"
-
                 },
 
-                body:
-                    JSON.stringify(
-                        payload
-                    )
+                body: JSON.stringify({
 
+                    timestamp:
+                        record.timestamp,
+
+                    subjectCode:
+                        record.subjectCode ||
+                        record.subject ||
+                        "",
+
+                    subjectName:
+                        record.subjectName ||
+                        "",
+
+                    studentNumber:
+                        record.studentNumber ||
+                        "",
+
+                    name:
+                        record.name ||
+                        "",
+
+                    year:
+                        record.year ||
+                        "",
+
+                    section:
+                        record.section ||
+                        "",
+
+                    date:
+                        record.date ||
+                        "",
+
+                    time:
+                        record.time ||
+                        "",
+
+                    status:
+                        record.status ||
+                        "PRESENT"
+
+                })
             }
         );
-
-
-    console.log(
-        "Google Sheets request completed."
-    );
 
 
     return response;

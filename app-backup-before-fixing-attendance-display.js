@@ -708,7 +708,9 @@ function recordStudentAttendance(student) {
     };
 
 
-    addAttendanceRecord(record);
+    attendance.push(record);
+
+    saveAttendance(attendance);
 
     /*
      * SAVE TO GOOGLE SHEETS
@@ -784,76 +786,21 @@ function renderAttendance() {
         return;
     }
 
-
     const attendance =
         getAttendance();
 
     const today =
         getToday();
 
-
-    /*
-     * DISPLAY TODAY'S ATTENDANCE
-     *
-     * New record structure uses:
-     *
-     * subjectCode
-     * subjectName
-     * studentNumber
-     * name
-     * year
-     * section
-     * date
-     * time
-     * status
-     *
-     * Older records may still contain
-     * "subject", so both formats are
-     * supported here.
-     */
-
     const todayRecords =
         attendance.filter(function(record) {
 
-            const recordSubjectCode =
-                String(
-                    record.subjectCode ||
-                    record.subject ||
-                    ""
-                ).trim();
-
-            const currentSubjectCode =
-                String(
-                    CURRENT_SUBJECT.code ||
-                    ""
-                ).trim();
-
-            const recordSubjectName =
-                String(
-                    record.subjectName ||
-                    ""
-                ).trim();
-
-            const currentSubjectName =
-                String(
-                    CURRENT_SUBJECT.name ||
-                    ""
-                ).trim();
-
-            const sameDate =
-                String(record.date || "") ===
-                String(today);
-
-            const sameSubject =
-                recordSubjectCode ===
-                    currentSubjectCode
-                ||
-                recordSubjectName ===
-                    currentSubjectName;
-
             return (
-                sameDate &&
-                sameSubject
+                String(record.date) ===
+                String(today) &&
+
+                String(record.subject) ===
+                String(CURRENT_SUBJECT.id)
             );
 
         });
@@ -871,7 +818,6 @@ function renderAttendance() {
             '</p>';
 
         return;
-
     }
 
 
@@ -890,10 +836,6 @@ function renderAttendance() {
                 "attendance-record";
 
 
-            /*
-             * STUDENT NAME
-             */
-
             const name =
                 document.createElement("div");
 
@@ -901,36 +843,19 @@ function renderAttendance() {
                 "student-name";
 
             name.textContent =
-                record.name || "Unknown Student";
+                record.name;
 
-
-            /*
-             * STUDENT INFORMATION
-             */
 
             const information =
                 document.createElement("div");
 
-            information.className =
-                "student-information";
-
             information.textContent =
-                String(
-                    record.studentNumber || ""
-                ) +
+                record.studentNumber +
                 " · " +
-                String(
-                    record.year || ""
-                ) +
+                record.year +
                 " · " +
-                String(
-                    record.section || ""
-                );
+                record.section;
 
-
-            /*
-             * DATE / TIME / STATUS
-             */
 
             const time =
                 document.createElement("div");
@@ -939,17 +864,11 @@ function renderAttendance() {
                 "student-time";
 
             time.textContent =
-                String(
-                    record.date || ""
-                ) +
+                record.date +
                 " · " +
-                String(
-                    record.time || ""
-                ) +
+                record.time +
                 " · " +
-                String(
-                    record.status || "PRESENT"
-                );
+                record.status;
 
 
             div.appendChild(name);
@@ -958,12 +877,12 @@ function renderAttendance() {
 
             div.appendChild(time);
 
-
             list.appendChild(div);
 
         });
 
 }
+
 
 function clearTodayAttendance() {
 
@@ -1251,103 +1170,47 @@ async function sendAttendanceToGoogle(record) {
     }
 
 
-    const payload = {
+    await fetch(
+        GOOGLE_SHEETS_URL,
+        {
+            method: "POST",
 
-        timestamp:
-            String(
-                record.timestamp || ""
-            ),
+            mode: "no-cors",
 
-        subjectCode:
-            String(
-                record.subjectCode ||
-                record.subject ||
-                ""
-            ),
+            headers: {
+                "Content-Type":
+                    "text/plain;charset=utf-8"
+            },
 
-        subjectName:
-            String(
-                record.subjectName || ""
-            ),
+            body: JSON.stringify({
 
-        studentNumber:
-            String(
-                record.studentNumber || ""
-            ),
+                subject:
+                    record.subject,
 
-        name:
-            String(
-                record.name || ""
-            ),
+                subjectName:
+                    record.subjectName,
 
-        year:
-            String(
-                record.year || ""
-            ),
+                studentNumber:
+                    record.studentNumber,
 
-        section:
-            String(
-                record.section || ""
-            ),
+                name:
+                    record.name,
 
-        date:
-            String(
-                record.date || ""
-            ),
+                year:
+                    record.year,
 
-        time:
-            String(
-                record.time || ""
-            ),
+                section:
+                    record.section,
 
-        status:
-            String(
-                record.status ||
-                "PRESENT"
-            )
+                date:
+                    record.date,
 
-    };
+                time:
+                    record.time
 
-
-    console.log(
-        "Sending attendance to Google Sheets:",
-        payload
+            })
+        }
     );
-
-
-    const response =
-        await fetch(
-            GOOGLE_SHEETS_URL,
-            {
-
-                method:
-                    "POST",
-
-                mode:
-                    "no-cors",
-
-                headers: {
-
-                    "Content-Type":
-                        "text/plain;charset=utf-8"
-
-                },
-
-                body:
-                    JSON.stringify(
-                        payload
-                    )
-
-            }
-        );
-
-
-    console.log(
-        "Google Sheets request completed."
-    );
-
-
-    return response;
 
 }
 
@@ -1366,16 +1229,8 @@ function queueGoogleRecord(record) {
         pending.some(function(item) {
 
             return (
-                String(
-                    item.subjectCode ||
-                    item.subject ||
-                    ""
-                ) ===
-                String(
-                    record.subjectCode ||
-                    record.subject ||
-                    ""
-                ) &&
+                String(item.subject) ===
+                String(record.subject) &&
 
                 String(item.studentNumber) ===
                 String(record.studentNumber) &&
