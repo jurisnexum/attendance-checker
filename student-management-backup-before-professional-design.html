@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="theme-color"
+        content="#4b2e83"
+    >
+
+    <title>
+        Student Management | JNX
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+    <link
+        rel="manifest"
+        href="manifest.json"
+    >
+
+</head>
+
+
+<body>
+
+<main class="app student-management-page">
+
+
+    <!-- HEADER -->
+
+    <header class="header">
+
+        <div>
+
+            <h1>
+                JURIS NEXUM
+            </h1>
+
+            <p>
+                Student Management
+            </p>
+
+        </div>
+
+    </header>
+
+
+    <!-- DASHBOARD NAVIGATION -->
+
+    <nav class="app-navigation">
+
+        <a
+            href="index.html"
+            class="dashboard-link"
+        >
+
+            <span
+                class="dashboard-link-icon"
+            >
+                ◉
+            </span>
+
+            <span>
+                Attendance Checker
+            </span>
+
+        </a>
+
+    </nav>
+
+
+    <div
+        class="student-management-dashboard"
+    >
+
+
+        <!-- STATISTICS -->
+
+        <section
+            class="student-management-card"
+        >
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        Student Directory
+                    </h2>
+
+                    <p
+                        id="studentManagementCount"
+                    >
+                        0 students
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <label
+                for="studentManagementSearch"
+            >
+                Search Student
+            </label>
+
+            <input
+                id="studentManagementSearch"
+                type="search"
+                placeholder="Search student number or name..."
+                autocomplete="off"
+            >
+
+        </section>
+
+
+        <!-- STUDENT FORM -->
+
+        <section
+            class="student-management-card"
+        >
+
+            <h2>
+                Student Information
+            </h2>
+
+            <p>
+                Add a new student or update an existing student.
+            </p>
+
+
+            <div
+                class="student-management-form"
+            >
+
+
+                <label
+                    for="manageStudentNumber"
+                >
+                    Student Number
+                </label>
+
+                <input
+                    id="manageStudentNumber"
+                    type="text"
+                    placeholder="e.g. 250006"
+                    autocomplete="off"
+                >
+
+
+                <label
+                    for="manageStudentName"
+                >
+                    Name
+                </label>
+
+                <input
+                    id="manageStudentName"
+                    type="text"
+                    placeholder="Surname, First Name Middle Name"
+                    autocomplete="off"
+                >
+
+
+                <label
+                    for="manageStudentYear"
+                >
+                    Year Level
+                </label>
+
+                <input
+                    id="manageStudentYear"
+                    type="text"
+                    placeholder="e.g. 4th Year"
+                    autocomplete="off"
+                >
+
+
+                <label
+                    for="manageStudentSection"
+                >
+                    Section
+                </label>
+
+                <input
+                    id="manageStudentSection"
+                    type="text"
+                    placeholder="e.g. A"
+                    autocomplete="off"
+                >
+
+
+                <div
+                    class="student-management-actions"
+                >
+
+                    <button
+                        id="addStudentButton"
+                        type="button"
+                    >
+                        Add Student
+                    </button>
+
+                    <button
+                        id="updateStudentButton"
+                        type="button"
+                    >
+                        Update Student
+                    </button>
+
+                    <button
+                        id="cancelStudentEditButton"
+                        type="button"
+                    >
+                        Clear
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="studentManagementResult"
+                    class="result"
+                ></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- STUDENT DIRECTORY -->
+
+        <section
+            class="student-management-card"
+        >
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        Registered Students
+                    </h2>
+
+                    <p>
+                        Students are automatically arranged alphabetically.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="studentManagementList"
+            >
+
+                <p class="empty">
+                    Loading students...
+                </p>
+
+            </div>
+
+        </section>
+
+
+    </div>
+
+</main>
+
+
+<script src="data/students.js"></script>
+
+<script src="student-management.js"></script>
+
+
+<script>
+
+if ("serviceWorker" in navigator) {
+
+    window.addEventListener(
+        "load",
+        function() {
+
+            navigator.serviceWorker
+                .register(
+                    "service-worker.js"
+                )
+                .then(function() {
+
+                    console.log(
+                        "JNX OFFLINE MODE READY"
+                    );
+
+                })
+                .catch(function(error) {
+
+                    console.error(
+                        "Offline mode error:",
+                        error
+                    );
+
+                });
+
+        }
+    );
+
+}
+
+</script>
+
+</body>
+
+</html>

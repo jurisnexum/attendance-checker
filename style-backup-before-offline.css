@@ -1,0 +1,66 @@
+
+/* STUDENT SELECTION */
+
+.student-choices {
+    margin-top: 15px;
+}
+
+.choices-heading {
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.student-choice {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 12px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.student-choice strong {
+    font-size: 16px;
+}
+
+
+/* DUPLICATE STUDENT SELECTION */
+
+.student-choices {
+    margin-top: 15px;
+    width: 100%;
+}
+
+.choices-heading {
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.student-choice {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 8px 0;
+    padding: 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: white;
+    color: #222;
+    text-align: left;
+    cursor: pointer;
+}
+
+.student-choice:hover {
+    opacity: 0.85;
+}
+
+.choice-name {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.choice-details {
+    font-size: 14px;
+}
+

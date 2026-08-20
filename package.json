@@ -1,0 +1,24 @@
+{
+  "name": "offline-attendance-checker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app-backup-before-db.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yawitch8-dev/offline-attendance-checker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/yawitch8-dev/offline-attendance-checker/issues"
+  },
+  "homepage": "https://github.com/yawitch8-dev/offline-attendance-checker#readme",
+  "dependencies": {
+    "exceljs": "^4.4.0"
+  }
+}

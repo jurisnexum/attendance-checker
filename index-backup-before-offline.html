@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline Attendance Checker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <main class="app">
+
+        <header class="header">
+            <h1>Attendance Checker</h1>
+            <p>Offline Student Attendance System</p>
+        </header>
+
+        <section class="attendance-card">
+
+            <h2>Record Attendance</h2>
+
+            <label for="studentNumber">
+                Student Number or Surname
+            </label>
+
+            <input
+                id="studentNumber"
+                type="text"
+                placeholder="Enter student number or surname"
+                autocomplete="off"
+            >
+
+            <button
+                id="attendanceButton"
+                type="button"
+            >
+                Mark Attendance
+            </button>
+
+            <div
+                id="result"
+                class="result"
+            ></div>
+
+            <div
+                id="studentChoices"
+                class="student-choices"
+            ></div>
+
+        </section>
+
+        <section class="today-card">
+
+            <div class="section-header">
+
+                <h2>
+                    Today's Attendance
+                </h2>
+
+                <span id="attendanceCount">
+                    0
+                </span>
+
+            </div>
+
+            <div id="attendanceList">
+
+                <p class="empty">
+                    No attendance recorded yet.
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <button
+        id="clearAttendanceButton"
+        type="button"
+    >
+        Clear Today Attendance
+    </button>
+
+    
+    <button
+        id="exportAttendanceButton"
+        type="button"
+    >
+        Export Attendance
+    </button>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline Attendance Checker</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+
+<body>
+
+    <main class="app">
+
+        <header class="header">
+            <h1>Attendance Checker</h1>
+            <p>Offline Student Attendance System</p>
+        </header>
+
+        <section class="attendance-card">
+
+            <h2>Record Attendance</h2>
+
+            <label for="studentNumber">
+                Student Number or Surname
+            </label>
+
+            <input
+                id="studentNumber"
+                type="text"
+                placeholder="Enter student number or surname"
+                autocomplete="off"
+            >
+
+            <button
+                id="attendanceButton"
+                type="button"
+            >
+                Mark Attendance
+            </button>
+
+            <div
+                id="result"
+                class="result"
+            ></div>
+
+            <div
+                id="studentChoices"
+                class="student-choices"
+            ></div>
+
+        </section>
+
+        <section class="today-card">
+
+            <div class="section-header">
+
+                <h2>
+                    Today's Attendance
+                </h2>
+
+                <span id="attendanceCount">
+                    0
+                </span>
+
+            </div>
+
+            <div id="attendanceList">
+
+                <p class="empty">
+                    No attendance recorded yet.
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <button
+        id="clearAttendanceButton"
+        type="button"
+    >
+        Clear Today Attendance
+    </button>
+
+    <!-- STUDENT MANAGEMENT -->
+
+    <section class="student-management-card">
+
+        <div class="section-header">
+
+            <div>
+                <h2>Student Management</h2>
+                <p id="studentManagementCount">
+                    0 students
+                </p>
+            </div>
+
+        </div>
+
+        <div class="student-management-form">
+
+            <label for="manageStudentNumber">
+                Student Number
+            </label>
+
+            <input
+                id="manageStudentNumber"
+                type="text"
+                placeholder="Student Number"
+                autocomplete="off"
+            >
+
+            <label for="manageStudentName">
+                Full Name
+            </label>
+
+            <input
+                id="manageStudentName"
+                type="text"
+                placeholder="Surname, First Name Middle Name"
+                autocomplete="off"
+            >
+
+            <label for="manageStudentYear">
+                Year
+            </label>
+
+            <input
+                id="manageStudentYear"
+                type="text"
+                placeholder="e.g. 4th Year"
+                autocomplete="off"
+            >
+
+            <label for="manageStudentSection">
+                Section
+            </label>
+
+            <input
+                id="manageStudentSection"
+                type="text"
+                placeholder="e.g. A"
+                autocomplete="off"
+            >
+
+            <div class="student-management-actions">
+
+                <button
+                    id="addStudentButton"
+                    type="button"
+                >
+                    Add Student
+                </button>
+
+                <button
+                    id="updateStudentButton"
+                    type="button"
+                >
+                    Update Student
+                </button>
+
+                <button
+                    id="cancelStudentEditButton"
+                    type="button"
+                >
+                    Cancel
+                </button>
+
+            </div>
+
+            <div
+                id="studentManagementResult"
+                class="result"
+            ></div>
+
+        </div>
+
+        <label for="studentManagementSearch">
+            Search Students
+        </label>
+
+        <input
+            id="studentManagementSearch"
+            type="text"
+            placeholder="Search by student number or name"
+            autocomplete="off"
+        >
+
+        <div
+            id="studentManagementList"
+            class="student-management-list"
+        ></div>
+
+    </section>
+
+
+    
+    <button
+        id="exportAttendanceButton"
+        type="button"
+    >
+        Export Attendance
+    </button>
+
+    <script src="data/students.js"></script>
+    <script src="data/attendance-db.js"></script>
+    <script src="app.js"></script>
+
+    <script>
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", function() {
+                navigator.serviceWorker.register("service-worker.js")
+                    .then(function() {
+                        console.log("JNX OFFLINE MODE READY");
+                    })
+                    .catch(function(error) {
+                        console.error("Offline mode error:", error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>

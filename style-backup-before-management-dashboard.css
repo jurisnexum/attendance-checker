@@ -1,0 +1,769 @@
+/* ============================================================
+   JNX ATTENDANCE MANAGEMENT SYSTEM
+   PROFESSIONAL UI
+   ============================================================ */
+
+:root {
+    --primary: #4b2e83;
+    --primary-dark: #351f5f;
+    --primary-light: #f3effa;
+
+    --success: #16834b;
+    --success-light: #eaf8f0;
+
+    --danger: #c62828;
+    --danger-light: #fdecec;
+
+    --warning: #b7791f;
+    --warning-light: #fff8e6;
+
+    --background: #f5f6fa;
+    --surface: #ffffff;
+    --border: #e3e5eb;
+
+    --text: #202124;
+    --muted: #6b7280;
+
+    --shadow:
+        0 4px 18px rgba(25, 25, 40, 0.07);
+
+    --radius: 14px;
+}
+
+
+/* ============================================================
+   RESET
+   ============================================================ */
+
+* {
+    box-sizing: border-box;
+}
+
+
+html {
+    scroll-behavior: smooth;
+}
+
+
+body {
+    margin: 0;
+    min-height: 100vh;
+
+    background:
+        linear-gradient(
+            180deg,
+            #f7f5fb 0%,
+            var(--background) 220px
+        );
+
+    color: var(--text);
+
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
+}
+
+
+/* ============================================================
+   MAIN APPLICATION
+   ============================================================ */
+
+.app {
+    width: min(1180px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 28px 0 60px;
+}
+
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.header {
+    position: relative;
+
+    margin-bottom: 28px;
+    padding: 30px;
+
+    overflow: hidden;
+
+    border-radius: 18px;
+
+    color: white;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary-dark),
+            var(--primary)
+        );
+
+    box-shadow:
+        0 10px 30px rgba(75, 46, 131, 0.20);
+}
+
+
+.header::after {
+    content: "";
+
+    position: absolute;
+
+    width: 260px;
+    height: 260px;
+
+    right: -90px;
+    top: -120px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(255, 255, 255, 0.08);
+}
+
+
+.header h1 {
+    position: relative;
+    z-index: 1;
+
+    margin: 0;
+
+    font-size: clamp(26px, 4vw, 36px);
+    font-weight: 750;
+    letter-spacing: -0.5px;
+}
+
+
+.header p {
+    position: relative;
+    z-index: 1;
+
+    margin: 7px 0 0;
+
+    color: rgba(255, 255, 255, 0.82);
+
+    font-size: 15px;
+}
+
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+
+.attendance-card,
+.today-card,
+.student-management-card {
+    margin-bottom: 22px;
+
+    padding: 24px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: var(--radius);
+
+    background:
+        var(--surface);
+
+    box-shadow:
+        var(--shadow);
+}
+
+
+.attendance-card h2,
+.today-card h2,
+.student-management-card h2 {
+    margin: 0 0 18px;
+
+    font-size: 20px;
+
+    letter-spacing: -0.2px;
+}
+
+
+/* ============================================================
+   LABELS
+   ============================================================ */
+
+label {
+    display: block;
+
+    margin: 0 0 7px;
+
+    color: #374151;
+
+    font-size: 13px;
+    font-weight: 650;
+}
+
+
+/* ============================================================
+   INPUTS
+   ============================================================ */
+
+input {
+    width: 100%;
+
+    min-height: 46px;
+
+    padding: 11px 13px;
+
+    border:
+        1px solid #d5d8df;
+
+    border-radius: 9px;
+
+    background: white;
+
+    color: var(--text);
+
+    font-family: inherit;
+    font-size: 15px;
+
+    outline: none;
+
+    transition:
+        border-color .15s ease,
+        box-shadow .15s ease;
+}
+
+
+input::placeholder {
+    color: #9aa0aa;
+}
+
+
+input:focus {
+    border-color:
+        var(--primary);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(75, 46, 131, 0.10);
+}
+
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+
+button {
+    min-height: 42px;
+
+    padding: 9px 15px;
+
+    border: 0;
+
+    border-radius: 9px;
+
+    background:
+        var(--primary);
+
+    color: white;
+
+    font-family: inherit;
+
+    font-size: 14px;
+    font-weight: 650;
+
+    cursor: pointer;
+
+    transition:
+        transform .12s ease,
+        background .15s ease,
+        box-shadow .15s ease;
+}
+
+
+button:hover {
+    background:
+        var(--primary-dark);
+
+    box-shadow:
+        0 4px 12px
+        rgba(75, 46, 131, 0.18);
+}
+
+
+button:active {
+    transform:
+        translateY(1px);
+}
+
+
+button:focus-visible {
+    outline:
+        3px solid
+        rgba(75, 46, 131, 0.25);
+
+    outline-offset: 2px;
+}
+
+
+/* MAIN ATTENDANCE BUTTON */
+
+#attendanceButton {
+    width: 100%;
+
+    margin-top: 13px;
+
+    min-height: 50px;
+
+    font-size: 15px;
+}
+
+
+/* ============================================================
+   RESULT MESSAGE
+   ============================================================ */
+
+.result {
+    min-height: 22px;
+
+    margin-top: 14px;
+
+    padding: 0;
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+
+.result.success {
+    color:
+        var(--success);
+}
+
+
+.result.error {
+    color:
+        var(--danger);
+}
+
+
+/* ============================================================
+   TODAY HEADER
+   ============================================================ */
+
+.section-header {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-bottom: 15px;
+}
+
+
+.section-header h2 {
+    margin: 0;
+}
+
+
+#attendanceCount {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 38px;
+    height: 32px;
+
+    padding: 0 10px;
+
+    border-radius: 20px;
+
+    background:
+        var(--primary-light);
+
+    color:
+        var(--primary);
+
+    font-size: 14px;
+    font-weight: 750;
+}
+
+
+/* ============================================================
+   ATTENDANCE RECORD
+   ============================================================ */
+
+.attendance-record {
+    display: grid;
+
+    grid-template-columns:
+        minmax(180px, 1.5fr)
+        minmax(190px, 1fr)
+        auto;
+
+    align-items: center;
+
+    gap: 16px;
+
+    padding: 15px 0;
+
+    border-top:
+        1px solid var(--border);
+}
+
+
+.student-name {
+    font-weight: 700;
+}
+
+
+.student-time {
+    color:
+        var(--muted);
+
+    font-size: 13px;
+}
+
+
+.empty {
+    margin: 0;
+
+    padding: 28px 10px;
+
+    text-align: center;
+
+    color:
+        var(--muted);
+
+    font-size: 14px;
+}
+
+
+/* ============================================================
+   STUDENT SELECTION
+   ============================================================ */
+
+.student-choices {
+    width: 100%;
+
+    margin-top: 15px;
+}
+
+
+.choices-heading {
+    margin-bottom: 10px;
+
+    color:
+        var(--muted);
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+.student-choice {
+    display: block;
+
+    width: 100%;
+
+    margin: 8px 0;
+
+    padding: 14px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 10px;
+
+    background:
+        #fafafa;
+
+    color:
+        var(--text);
+
+    text-align: left;
+
+    box-shadow: none;
+}
+
+
+.student-choice:hover {
+    border-color:
+        var(--primary);
+
+    background:
+        var(--primary-light);
+
+    color:
+        var(--text);
+
+    box-shadow: none;
+}
+
+
+.choice-name {
+    margin-bottom: 5px;
+
+    font-size: 15px;
+    font-weight: 750;
+}
+
+
+.choice-details {
+    color:
+        var(--muted);
+
+    font-size: 13px;
+}
+
+
+/* ============================================================
+   STUDENT MANAGEMENT
+   ============================================================ */
+
+.student-management-form {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 12px 16px;
+}
+
+
+.student-management-form label {
+    margin-top: 3px;
+}
+
+
+.student-management-form input {
+    margin-bottom: 4px;
+}
+
+
+.student-management-actions {
+    grid-column: 1 / -1;
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 9px;
+
+    margin-top: 5px;
+}
+
+
+.student-management-actions button {
+    min-width: 120px;
+}
+
+
+#cancelStudentEditButton {
+    background:
+        #6b7280;
+}
+
+
+#cancelStudentEditButton:hover {
+    background:
+        #4b5563;
+}
+
+
+#studentManagementSearch {
+    margin-bottom: 15px;
+}
+
+
+/* ============================================================
+   STUDENT MANAGEMENT LIST
+   ============================================================ */
+
+#studentManagementList {
+    border-top:
+        1px solid var(--border);
+}
+
+
+.student-management-item {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 15px 0;
+
+    border-bottom:
+        1px solid var(--border);
+}
+
+
+.student-management-item strong {
+    display: block;
+
+    margin-bottom: 4px;
+
+    font-size: 15px;
+}
+
+
+.student-management-item div {
+    color:
+        var(--muted);
+
+    font-size: 13px;
+}
+
+
+.student-management-item-actions {
+    display: flex;
+
+    gap: 7px;
+
+    flex-shrink: 0;
+}
+
+
+.student-management-item-actions button {
+    min-height: 36px;
+
+    padding:
+        7px 11px;
+
+    font-size: 13px;
+}
+
+
+.student-management-item-actions button:last-child {
+    background:
+        var(--danger);
+}
+
+
+.student-management-item-actions button:last-child:hover {
+    background:
+        #a61f1f;
+}
+
+
+/* ============================================================
+   SECONDARY ACTIONS
+   ============================================================ */
+
+#clearAttendanceButton,
+#exportAttendanceButton {
+    margin:
+        0 6px 20px 0;
+
+    background:
+        #5f6368;
+}
+
+
+#clearAttendanceButton:hover,
+#exportAttendanceButton:hover {
+    background:
+        #3f4145;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 760px) {
+
+    .app {
+        width:
+            min(
+                100% - 20px,
+                1180px
+            );
+
+        padding-top: 10px;
+    }
+
+
+    .header {
+        padding: 24px 20px;
+
+        border-radius: 14px;
+    }
+
+
+    .attendance-card,
+    .today-card,
+    .student-management-card {
+        padding: 19px;
+
+        border-radius: 12px;
+    }
+
+
+    .student-management-form {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .student-management-actions {
+        grid-column: auto;
+    }
+
+
+    .attendance-record {
+        grid-template-columns:
+            1fr;
+
+        gap: 5px;
+    }
+
+
+    .student-management-item {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+
+    .student-management-item-actions {
+        width: 100%;
+    }
+
+
+    .student-management-item-actions button {
+        flex: 1;
+    }
+
+}
+
+
+@media (max-width: 450px) {
+
+    .header h1 {
+        font-size: 25px;
+    }
+
+
+    .student-management-actions {
+        flex-direction: column;
+    }
+
+
+    .student-management-actions button {
+        width: 100%;
+    }
+
+
+    #clearAttendanceButton,
+    #exportAttendanceButton {
+        width: 100%;
+
+        margin-right: 0;
+    }
+
+}
