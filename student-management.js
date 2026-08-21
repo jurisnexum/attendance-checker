@@ -12,27 +12,133 @@ let editingStudentNumber = null;
 
 
 /* ============================================================
+   CURRENT MAYOR / CLASS REGISTRATION
+   ============================================================ */
+
+function getStudentClassRegistration() {
+
+    try {
+
+        const saved =
+            localStorage.getItem(
+                "jnx_class_registration"
+            );
+
+
+        if (!saved) {
+
+            return null;
+
+        }
+
+
+        const registration =
+            JSON.parse(
+                saved
+            );
+
+
+        if (
+            !registration ||
+            !registration.classId
+        ) {
+
+            return null;
+
+        }
+
+
+        return registration;
+
+    } catch (error) {
+
+        console.error(
+            "Could not read class registration:",
+            error
+        );
+
+        return null;
+
+    }
+
+}
+
+
+/* ============================================================
+   GET STUDENT STORAGE KEY
+   ============================================================ */
+
+function getStudentStorageKey() {
+
+    const registration =
+        getStudentClassRegistration();
+
+    /*
+     * The Attendance Checker and Student Management
+     * MUST use exactly the same storage-key algorithm.
+     */
+
+    if (
+        registration &&
+        registration.classId
+    ) {
+
+        return (
+            STUDENT_DATABASE_BASE_KEY +
+            "_" +
+            String(
+                registration.classId
+            )
+        );
+
+    }
+
+    return STUDENT_DATABASE_BASE_KEY;
+
+}
+
+
+/* ============================================================
    LOAD STUDENTS
    ============================================================ */
 
 function loadStudents() {
 
+    const storageKey =
+        getStudentStorageKey();
+
+
+    const registration =
+        getStudentClassRegistration();
+
+
     const saved =
         localStorage.getItem(
-            STUDENT_DATABASE_KEY
+            storageKey
         );
 
+
+    /*
+     * If this mayor already has a student database,
+     * load it.
+     */
 
     if (saved) {
 
         try {
 
             const parsed =
-                JSON.parse(saved);
+                JSON.parse(
+                    saved
+                );
 
-            if (Array.isArray(parsed)) {
 
-                students = parsed;
+            if (
+                Array.isArray(parsed)
+            ) {
+
+                students =
+                    parsed;
 
                 return;
 
@@ -49,6 +155,37 @@ function loadStudents() {
 
     }
 
+
+    /*
+     * NEW REGISTERED MAYOR
+     *
+     * A newly registered mayor must start with
+     * ZERO students.
+     *
+     * Do NOT copy STUDENTS from data/students.js.
+     */
+
+    if (
+        registration &&
+        registration.classId
+    ) {
+
+        students = [];
+
+        saveStudents();
+
+        return;
+
+    }
+
+
+    /*
+     * ORIGINAL MAYOR
+     *
+     * Preserve the original student database and
+     * initialize it from data/students.js only when
+     * the original database does not exist yet.
+     */
 
     if (
         typeof STUDENTS !== "undefined" &&
@@ -87,7 +224,12 @@ function loadStudents() {
 
         saveStudents();
 
+        return;
+
     }
+
+
+    students = [];
 
 }
 
@@ -98,10 +240,57 @@ function loadStudents() {
 
 function saveStudents() {
 
-    localStorage.setItem(
-        STUDENT_DATABASE_KEY,
-        JSON.stringify(students)
-    );
+    const storageKey =
+        getStudentStorageKey();
+
+
+    try {
+
+        localStorage.setItem(
+
+            storageKey,
+
+            JSON.stringify(
+                students
+            )
+
+        );
+
+
+        /*
+         * Verify that the correct mayor-specific
+         * database was actually saved.
+         */
+
+        const verification =
+            localStorage.getItem(
+                storageKey
+            );
+
+
+        if (
+            verification === null
+        ) {
+
+            throw new Error(
+                "Student database could not be saved."
+            );
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Could not save student database:",
+            error
+        );
+
+        showManagementResult(
+            "Could not save the student database.",
+            false
+        );
+
+    }
 
 }
 
@@ -867,7 +1056,7 @@ document.addEventListener(
                 function() {
 
                     window.location.href =
-                        "index.html";
+                        "attendance.html";
 
                 }
             );
