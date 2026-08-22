@@ -1605,6 +1605,14 @@
 
     function getSubjects() {
 
+        /*
+         * Always reload the current mayor's subject
+         * database from localStorage.
+         *
+         * This ensures the dashboard immediately
+         * reflects newly saved subjects.
+         */
+
         if (
             typeof loadSubjects ===
             "function"
@@ -2014,6 +2022,223 @@
                 generateSubjectIcon(
                     subjectName.value
                 );
+
+        }
+    );
+
+
+    /*
+     * GOOGLE SHEETS SUBJECT SYNC
+     *
+     * When a subject is created, notify
+     * the mayor's registered Apps Script.
+     *
+     * This does NOT prevent offline use.
+     */
+
+    async function syncSubjectToGoogle(subject) {
+
+        try {
+
+            const registrationRaw =
+                localStorage.getItem(
+                    "jnx_mayor_registration"
+                );
+
+
+            if (!registrationRaw) {
+
+                console.warn(
+                    "No mayor registration found. Subject remains local."
+                );
+
+                return;
+
+            }
+
+
+            const registration =
+                JSON.parse(
+                    registrationRaw
+                );
+
+
+            const googleSheetUrl =
+                String(
+                    registration.googleSheetUrl ||
+                    ""
+                ).trim();
+
+
+            if (!googleSheetUrl) {
+
+                console.warn(
+                    "No Google Apps Script URL configured."
+                );
+
+                return;
+
+            }
+
+
+            /*
+             * Send the complete subject
+             * information to Apps Script.
+             */
+
+            const response =
+                await fetch(
+                    googleSheetUrl,
+                    {
+
+                        method:
+                            "POST",
+
+                        headers: {
+
+                            "Content-Type":
+                                "text/plain;charset=utf-8"
+
+                        },
+
+                        body:
+                            JSON.stringify({
+
+                                action:
+                                    "CREATE_SUBJECT",
+
+                                subject: {
+
+                                    id:
+                                        subject.id,
+
+                                    name:
+                                        subject.name,
+
+                                    code:
+                                        subject.code,
+
+                                    icon:
+                                        subject.icon || "📚"
+
+                                },
+
+                                classInfo: {
+
+                                    yearLevel:
+                                        registration.yearLevel || "",
+
+                                    section:
+                                        registration.section || "",
+
+                                    program:
+                                        registration.program || ""
+
+                                }
+
+                            })
+
+                    }
+                );
+
+
+            let data = null;
+
+
+            try {
+
+                data =
+                    await response.json();
+
+            } catch (error) {
+
+                /*
+                 * Apps Script may return
+                 * a non-JSON response.
+                 */
+
+            }
+
+
+            if (
+                data &&
+                data.success === false
+            ) {
+
+                console.warn(
+                    "Google subject sync rejected:",
+                    data
+                );
+
+                return;
+
+            }
+
+
+            console.log(
+                "Subject synchronized with Google Sheets:",
+                subject.name
+            );
+
+
+        } catch (error) {
+
+            /*
+             * IMPORTANT:
+             *
+             * Google synchronization failure
+             * must NEVER stop the offline
+             * attendance application.
+             */
+
+            console.warn(
+                "Google subject sync unavailable. Subject remains available offline.",
+                error
+            );
+
+        }
+
+    }
+
+
+    /*
+     * ENTER KEY SUPPORT
+     *
+     * Pressing Enter in either subject field
+     * triggers the existing Save Subject button.
+     */
+
+    subjectName.addEventListener(
+        "keydown",
+        function(event) {
+
+            if (event.key === "Enter") {
+
+                event.preventDefault();
+
+                form.querySelector(
+                    'button[type="submit"]'
+                ).click();
+
+            }
+
+        }
+    );
+
+
+    subjectCode.addEventListener(
+        "keydown",
+        function(event) {
+
+            if (event.key === "Enter") {
+
+                event.preventDefault();
+
+                form.querySelector(
+                    'button[type="submit"]'
+                ).click();
+
+            }
 
         }
     );

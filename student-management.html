@@ -10,11 +10,6 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <meta
-        name="theme-color"
-        content="#4b2e83"
-    >
-
     <title>
         Student Management | JNX Attendance
     </title>
@@ -24,567 +19,136 @@
         href="style.css"
     >
 
-    <link
-        rel="manifest"
-        href="manifest.json"
-    >
-
 </head>
 
 
-<body class="dashboard-body">
+<body>
 
+    <main class="app">
 
-<div class="dashboard-layout">
-
-
-    <!-- SIDEBAR -->
-
-    <aside class="dashboard-sidebar">
-
-        <div class="sidebar-brand">
-
-            <div class="sidebar-logo">
-                JNX
-            </div>
+        <header class="app-header">
 
             <div>
-
-                <strong>
-                    JURIS NEXUM
-                </strong>
-
-                <span>
-                    Attendance System
-                </span>
-
-            </div>
-
-        </div>
-
-
-        <div class="sidebar-section-title">
-            MAIN
-        </div>
-
-
-        <nav class="sidebar-navigation">
-
-            <a
-                href="index.html"
-                class="sidebar-link"
-            >
-
-                <span class="sidebar-icon">
-                    ⌂
-                </span>
-
-                <span>
-                    Home
-                </span>
-
-            </a>
-
-
-            <a
-                href="attendance.html"
-                class="sidebar-link"
-            >
-
-                <span class="sidebar-icon">
-                    ✓
-                </span>
-
-                <span>
-                    Attendance Checker
-                </span>
-
-            </a>
-
-
-            <a
-                href="student-management.html"
-                class="sidebar-link active"
-            >
-
-                <span class="sidebar-icon">
-                    ◉
-                </span>
-
-                <span>
-                    Student Management
-                </span>
-
-            </a>
-
-        </nav>
-
-
-        <div class="sidebar-footer">
-
-            <span>
-                Offline System
-            </span>
-
-            <span class="offline-indicator">
-                ● Online Ready
-            </span>
-
-        </div>
-
-    </aside>
-
-
-
-    <!-- MAIN CONTENT -->
-
-    <main class="dashboard-main">
-
-
-        <!-- TOP BAR -->
-
-        <header class="dashboard-topbar">
-
-            <div>
-
-                <div class="dashboard-breadcrumb">
-                    JNX Attendance / Students
-                </div>
 
                 <h1>
                     Student Management
                 </h1>
 
                 <p>
-                    Manage the registered students used by the
-                    attendance system.
+                    Add and manage classmates for attendance
                 </p>
 
             </div>
 
 
-            <div class="dashboard-status">
+            <nav class="dashboard-nav">
 
-                <span class="status-dot"></span>
+                <a
+                    href="index.html"
+                    class="dashboard-nav-button"
+                >
+                    <span>←</span>
+                    <span>Home</span>
+                </a>
 
-                Offline Ready
-
-            </div>
+            </nav>
 
         </header>
 
 
+        <section class="attendance-card">
 
-        <!-- SUMMARY CARDS -->
+            <h2>
+                Add Student
+            </h2>
 
-        <section class="dashboard-stats">
 
+            <form id="studentForm">
 
-            <div class="dashboard-stat-card">
+                <label for="studentNumber">
+                    Student Number
+                </label>
 
-                <div class="stat-icon">
-                    👥
-                </div>
-
-                <div>
-
-                    <span class="stat-label">
-                        Total Students
-                    </span>
-
-                    <strong
-                        id="studentManagementCount"
-                    >
-                        0
-                    </strong>
-
-                </div>
-
-            </div>
-
-
-            <div class="dashboard-stat-card">
-
-                <div class="stat-icon">
-                    📚
-                </div>
-
-                <div>
-
-                    <span class="stat-label">
-                        Student Database
-                    </span>
-
-                    <strong>
-                        Active
-                    </strong>
-
-                </div>
-
-            </div>
-
-
-            <div class="dashboard-stat-card">
-
-                <div class="stat-icon">
-                    ⚡
-                </div>
-
-                <div>
-
-                    <span class="stat-label">
-                        System Mode
-                    </span>
-
-                    <strong>
-                        Offline
-                    </strong>
-
-                </div>
-
-            </div>
-
-
-        </section>
-
-
-
-        <!-- CONTENT GRID -->
-
-        <section class="management-grid">
-
-
-            <!-- STUDENT FORM -->
-
-            <section class="professional-card">
-
-                <div class="card-heading">
-
-                    <div>
-
-                        <span class="card-eyebrow">
-                            STUDENT RECORD
-                        </span>
-
-                        <h2>
-                            Student Information
-                        </h2>
-
-                        <p>
-                            Add or update a student record.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="professional-form">
-
-
-                    <div class="form-field">
-
-                        <label
-                            for="manageStudentNumber"
-                        >
-                            Student Number
-                        </label>
-
-                        <input
-                            id="manageStudentNumber"
-                            type="text"
-                            placeholder="e.g. 250006"
-                            autocomplete="off"
-                        >
-
-                    </div>
-
-
-                    <div class="form-field">
-
-                        <label
-                            for="manageStudentName"
-                        >
-                            Full Name
-                        </label>
-
-                        <input
-                            id="manageStudentName"
-                            type="text"
-                            placeholder="Surname, First Name Middle Name"
-                            autocomplete="off"
-                        >
-
-                        <small>
-                            Format: Surname, First Name Middle Name
-                        </small>
-
-                    </div>
-
-
-                    <div class="form-row">
-
-
-                        <div class="form-field">
-
-                            <label
-                                for="manageStudentYear"
-                            >
-                                Year Level
-                            </label>
-
-                            <input
-                                id="manageStudentYear"
-                                type="text"
-                                placeholder="4th Year"
-                                autocomplete="off"
-                            >
-
-                        </div>
-
-
-                        <div class="form-field">
-
-                            <label
-                                for="manageStudentSection"
-                            >
-                                Section
-                            </label>
-
-                            <input
-                                id="manageStudentSection"
-                                type="text"
-                                placeholder="A"
-                                autocomplete="off"
-                            >
-
-                        </div>
-
-
-                    </div>
-
-
-                    <div class="professional-form-actions">
-
-                        <button
-                            id="addStudentButton"
-                            type="button"
-                            class="primary-action"
-                        >
-                            Add Student
-                        </button>
-
-
-                        <button
-                            id="updateStudentButton"
-                            type="button"
-                            class="secondary-action"
-                        >
-                            Update
-                        </button>
-
-
-                        <button
-                            id="cancelStudentEditButton"
-                            type="button"
-                            class="ghost-action"
-                        >
-                            Clear
-                        </button>
-
-                    </div>
-
-
-                    <div
-                        id="studentManagementResult"
-                        class="result"
-                    ></div>
-
-
-                </div>
-
-            </section>
-
-
-
-            <!-- DIRECTORY -->
-
-            <section class="professional-card directory-card">
-
-
-                <div class="card-heading directory-heading">
-
-                    <div>
-
-                        <span class="card-eyebrow">
-                            DIRECTORY
-                        </span>
-
-                        <h2>
-                            Registered Students
-                        </h2>
-
-                        <p>
-                            Search and manage registered students.
-                        </p>
-
-                    </div>
-
-
-                    <div class="directory-count">
-
-                        <span>
-                            Students
-                        </span>
-
-                        <strong
-                            id="directoryCount"
-                        >
-                            0
-                        </strong>
-
-                    </div>
-
-                </div>
-
-
-
-                <div class="professional-search">
-
-                    <span class="search-icon">
-                        ⌕
-                    </span>
-
-                    <input
-                        id="studentManagementSearch"
-                        type="search"
-                        placeholder="Search by student number or name..."
-                        autocomplete="off"
-                    >
-
-                </div>
-
-
-
-                <div
-                    id="studentManagementList"
-                    class="professional-student-list"
+                <input
+                    type="text"
+                    id="studentNumber"
+                    placeholder="Enter student number"
+                    autocomplete="off"
+                    required
                 >
 
-                    <div class="directory-empty">
-                        Loading student records...
-                    </div>
+
+                <label for="studentName">
+                    Student Name
+                </label>
+
+                <input
+                    type="text"
+                    id="studentName"
+                    placeholder="Enter student's full name"
+                    autocomplete="off"
+                    required
+                >
+
+
+                <div>
+
+                    <button
+                        type="submit"
+                        id="saveStudentButton"
+                    >
+                        Add Student
+                    </button>
+
+                    <button
+                        type="button"
+                        id="cancelStudentButton"
+                        hidden
+                    >
+                        Cancel
+                    </button>
 
                 </div>
 
-
-            </section>
-
+            </form>
 
         </section>
 
+
+        <section class="today-card">
+
+            <h2>
+                Classmates
+            </h2>
+
+
+            <input
+                type="search"
+                id="studentSearch"
+                placeholder="Search student number or name..."
+                autocomplete="off"
+            >
+
+
+            <div id="studentCount">
+                0 students
+            </div>
+
+
+            <div id="studentList">
+
+                <p>
+                    No students added yet.
+                </p>
+
+            </div>
+
+        </section>
 
     </main>
 
-</div>
 
-
-
-<script src="data/students.js"></script>
-
-<script src="student-management.js"></script>
-
-
-<script>
-
-if ("serviceWorker" in navigator) {
-
-    window.addEventListener(
-        "load",
-        function() {
-
-            navigator.serviceWorker
-                .register("service-worker.js")
-                .then(function() {
-
-                    console.log(
-                        "JNX OFFLINE MODE READY"
-                    );
-
-                })
-                .catch(function(error) {
-
-                    console.error(
-                        "Offline mode error:",
-                        error
-                    );
-
-                });
-
-        }
-    );
-
-}
-
-</script>
-
-
-
-<script>
-(function() {
-
-    if (!("serviceWorker" in navigator)) {
-        return;
-    }
-
-    navigator.serviceWorker.register(
-        "service-worker.js"
-    ).then(function(registration) {
-
-        registration.update();
-
-        registration.addEventListener(
-            "updatefound",
-            function() {
-
-                const newWorker =
-                    registration.installing;
-
-                if (!newWorker) {
-                    return;
-                }
-
-                newWorker.addEventListener(
-                    "statechange",
-                    function() {
-
-                        if (
-                            newWorker.state ===
-                            "installed" &&
-                            navigator.serviceWorker.controller
-                        ) {
-
-                            window.location.reload();
-
-                        }
-
-                    }
-                );
-
-            }
-        );
-
-    }).catch(function(error) {
-
-        console.error(
-            "Service worker error:",
-            error
-        );
-
-    });
-
-})();
-</script>
+    <script src="student-management.js"></script>
 
 </body>
 

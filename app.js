@@ -97,89 +97,6 @@ function displayCurrentSubject() {
 
 
 
-/* ============================================================
-   CURRENT MAYOR / CLASS REGISTRATION
-   ============================================================ */
-
-function getAppClassRegistration() {
-
-    try {
-
-        const saved =
-            localStorage.getItem(
-                "jnx_class_registration"
-            );
-
-        if (!saved) {
-            return null;
-        }
-
-        const registration =
-            JSON.parse(saved);
-
-        if (
-            !registration ||
-            !registration.classId
-        ) {
-            return null;
-        }
-
-        return registration;
-
-    } catch (error) {
-
-        console.error(
-            "Could not read class registration:",
-            error
-        );
-
-        return null;
-    }
-}
-
-
-/* ============================================================
-   MAYOR-SPECIFIC STORAGE KEY
-   ============================================================ */
-
-function getAppStorageKey(baseKey) {
-
-    const registration =
-        getAppClassRegistration();
-
-    /*
-     * ORIGINAL MAYOR
-     *
-     * Preserve the original keys.
-     */
-
-    if (
-        !registration ||
-        !registration.classId
-    ) {
-
-        return baseKey;
-
-    }
-
-    /*
-     * REGISTERED MAYOR
-     *
-     * Every registered mayor/class gets
-     * a completely isolated database.
-     */
-
-    return (
-        baseKey +
-        "_" +
-        String(
-            registration.classId
-        )
-    );
-
-}
-
-
 /* GOOGLE SHEETS */
 
 const GOOGLE_SHEETS_URL =
@@ -193,15 +110,8 @@ let students = [];
 
 async function loadStudents() {
 
-    /*
-     * ALWAYS use the same mayor-specific student database
-     * used by Student Management.
-     */
-
     const STUDENT_DATABASE_KEY =
-        getAppStorageKey(
-            "jnx_student_database"
-        );
+        "jnx_student_database";
 
 
     /*
@@ -293,30 +203,9 @@ async function loadStudents() {
     /*
      * FIRST-RUN FALLBACK
      *
-     * A REGISTERED MAYOR must NEVER fall back to
-     * data/students.js.
-     *
-     * Only the original mayor may use the legacy
-     * STUDENTS database.
+     * If the local database does not exist yet,
+     * initialize it from data/students.js.
      */
-
-    const registration =
-        getAppClassRegistration();
-
-    if (
-        registration &&
-        registration.classId
-    ) {
-
-        students = [];
-
-        console.log(
-            "Registered class has no student database yet."
-        );
-
-        return;
-
-    }
 
     if (
         typeof STUDENTS !== "undefined" &&
@@ -500,7 +389,9 @@ function saveAttendance(records) {
 function findStudents(searchTerm) {
 
     const search =
-        String(searchTerm || "").trim().toLowerCase();
+        String(searchTerm || "")
+            .trim()
+            .toLowerCase();
 
     if (!search) {
         return [];
@@ -513,21 +404,49 @@ function findStudents(searchTerm) {
                 .trim()
                 .toLowerCase();
 
-        const name =
+        const fullName =
             String(student.name || "")
                 .trim()
                 .toLowerCase();
 
-        const parts = name.split(/\s+/);
+        const nameParts =
+            fullName.split(/\s+/);
 
         const surname =
-            parts.length > 1
-                ? parts[parts.length - 1]
-                : name;
+            nameParts.length > 1
+                ? nameParts[nameParts.length - 1]
+                : fullName;
+
+        /*
+         * ATTENDANCE SEARCH
+         *
+         * Student number:
+         * - exact
+         * - partial
+         *
+         * Full name:
+         * - exact
+         * - partial
+         *
+         * Surname:
+         * - exact
+         * - partial
+         *
+         * Example:
+         * "Juan Dela Cruz"
+         *
+         * Searches:
+         * 250002
+         * 002
+         * Juan
+         * Dela
+         * Cruz
+         */
 
         return (
-            number === search ||
-            surname === search
+            number.includes(search) ||
+            fullName.includes(search) ||
+            surname.includes(search)
         );
 
     });
@@ -1311,9 +1230,7 @@ renderAttendance();
    ============================================================ */
 
 const GOOGLE_SYNC_KEY =
-    getAppStorageKey(
-        "jnx_google_sheets_pending"
-    );
+    "jnx_google_sheets_pending";
 
 
 function getPendingGoogleRecords() {
@@ -1635,6 +1552,860 @@ window.addEventListener(
 
     }
 );
+
+
+
+/* ============================================================
+   STUDENT MANAGEMENT
+   ============================================================ */
+
+const STUDENT_DATABASE_KEY =
+    "jnx_student_database";
+
+
+let editingStudentNumber = null;
+
+
+/* LOAD EDITABLE STUDENT DATABASE */
+
+function loadEditableStudents() {
+
+    const saved =
+        localStorage.getItem(
+            STUDENT_DATABASE_KEY
+        );
+
+    if (!saved) {
+
+        /*
+         * First installation:
+         * copy the original STUDENTS database
+         * into the editable local database.
+         */
+
+        if (
+            typeof STUDENTS !== "undefined" &&
+            Array.isArray(STUDENTS)
+        ) {
+
+            students =
+                STUDENTS.map(function(student) {
+
+                    return {
+                        studentNumber:
+                            String(
+                                student.studentNumber
+                            ).trim(),
+
+                        name:
+                            String(
+                                student.name || ""
+                            ).trim(),
+
+                        year:
+                            String(
+                                student.year || ""
+                            ).trim(),
+
+                        section:
+                            String(
+                                student.section || ""
+                            ).trim()
+                    };
+
+                });
+
+            saveEditableStudents();
+
+        }
+
+        return;
+    }
+
+
+    try {
+
+        const parsed =
+            JSON.parse(saved);
+
+        if (Array.isArray(parsed)) {
+
+            students = parsed;
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Student database error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* SAVE STUDENT DATABASE */
+
+function saveEditableStudents() {
+
+    localStorage.setItem(
+        STUDENT_DATABASE_KEY,
+        JSON.stringify(students)
+    );
+
+}
+
+
+/* SHOW MANAGEMENT MESSAGE */
+
+function showStudentManagementResult(
+    message,
+    success
+) {
+
+    const result =
+        document.getElementById(
+            "studentManagementResult"
+        );
+
+    if (!result) {
+        return;
+    }
+
+    result.textContent =
+        message;
+
+    result.className =
+        success
+            ? "result success"
+            : "result error";
+
+}
+
+
+/* CLEAR STUDENT FORM */
+
+function clearStudentForm() {
+
+    document.getElementById(
+        "manageStudentNumber"
+    ).value = "";
+
+    document.getElementById(
+        "manageStudentName"
+    ).value = "";
+
+    document.getElementById(
+        "manageStudentYear"
+    ).value = "";
+
+    document.getElementById(
+        "manageStudentSection"
+    ).value = "";
+
+    editingStudentNumber =
+        null;
+
+}
+
+
+/* ADD STUDENT */
+
+function addManagedStudent() {
+
+    const studentNumber =
+        document.getElementById(
+            "manageStudentNumber"
+        ).value.trim();
+
+    const name =
+        document.getElementById(
+            "manageStudentName"
+        ).value.trim();
+
+    const year =
+        document.getElementById(
+            "manageStudentYear"
+        ).value.trim();
+
+    const section =
+        document.getElementById(
+            "manageStudentSection"
+        ).value.trim();
+
+
+    if (
+        !studentNumber ||
+        !name ||
+        !year ||
+        !section
+    ) {
+
+        showStudentManagementResult(
+            "Please complete all student fields.",
+            false
+        );
+
+        return;
+    }
+
+
+    const exists =
+        students.some(function(student) {
+
+            return (
+                String(
+                    student.studentNumber
+                ).trim() ===
+                studentNumber
+            );
+
+        });
+
+
+    if (exists) {
+
+        showStudentManagementResult(
+            "That student number already exists.",
+            false
+        );
+
+        return;
+    }
+
+
+    students.push({
+
+        studentNumber:
+            studentNumber,
+
+        name:
+            name,
+
+        year:
+            year,
+
+        section:
+            section
+
+    });
+
+
+    saveEditableStudents();
+
+    renderStudentManagement();
+
+    clearStudentForm();
+
+
+    showStudentManagementResult(
+        name +
+        " has been added successfully.",
+        true
+    );
+
+}
+
+
+/* EDIT STUDENT */
+
+function editManagedStudent(
+    studentNumber
+) {
+
+    const student =
+        students.find(function(item) {
+
+            return (
+                String(
+                    item.studentNumber
+                ) ===
+                String(studentNumber)
+            );
+
+        });
+
+
+    if (!student) {
+        return;
+    }
+
+
+    document.getElementById(
+        "manageStudentNumber"
+    ).value =
+        student.studentNumber;
+
+
+    document.getElementById(
+        "manageStudentName"
+    ).value =
+        student.name;
+
+
+    document.getElementById(
+        "manageStudentYear"
+    ).value =
+        student.year;
+
+
+    document.getElementById(
+        "manageStudentSection"
+    ).value =
+        student.section;
+
+
+    editingStudentNumber =
+        student.studentNumber;
+
+
+    showStudentManagementResult(
+        "Editing " +
+        student.name +
+        ".",
+        true
+    );
+
+}
+
+
+/* UPDATE STUDENT */
+
+function updateManagedStudent() {
+
+    if (!editingStudentNumber) {
+
+        showStudentManagementResult(
+            "Select a student to edit first.",
+            false
+        );
+
+        return;
+    }
+
+
+    const studentNumber =
+        document.getElementById(
+            "manageStudentNumber"
+        ).value.trim();
+
+    const name =
+        document.getElementById(
+            "manageStudentName"
+        ).value.trim();
+
+    const year =
+        document.getElementById(
+            "manageStudentYear"
+        ).value.trim();
+
+    const section =
+        document.getElementById(
+            "manageStudentSection"
+        ).value.trim();
+
+
+    if (
+        !studentNumber ||
+        !name ||
+        !year ||
+        !section
+    ) {
+
+        showStudentManagementResult(
+            "Please complete all student fields.",
+            false
+        );
+
+        return;
+    }
+
+
+    const duplicate =
+        students.some(function(student) {
+
+            return (
+                String(
+                    student.studentNumber
+                ) ===
+                studentNumber &&
+
+                String(
+                    student.studentNumber
+                ) !==
+                String(editingStudentNumber)
+            );
+
+        });
+
+
+    if (duplicate) {
+
+        showStudentManagementResult(
+            "That student number already exists.",
+            false
+        );
+
+        return;
+    }
+
+
+    const index =
+        students.findIndex(function(student) {
+
+            return (
+                String(
+                    student.studentNumber
+                ) ===
+                String(editingStudentNumber)
+            );
+
+        });
+
+
+    if (index === -1) {
+
+        showStudentManagementResult(
+            "Student could not be found.",
+            false
+        );
+
+        return;
+    }
+
+
+    students[index] = {
+
+        studentNumber:
+            studentNumber,
+
+        name:
+            name,
+
+        year:
+            year,
+
+        section:
+            section
+
+    };
+
+
+    saveEditableStudents();
+
+    renderStudentManagement();
+
+    clearStudentForm();
+
+
+    showStudentManagementResult(
+        name +
+        " has been updated successfully.",
+        true
+    );
+
+}
+
+
+/* DELETE STUDENT */
+
+function deleteManagedStudent(
+    studentNumber
+) {
+
+    const student =
+        students.find(function(item) {
+
+            return (
+                String(
+                    item.studentNumber
+                ) ===
+                String(studentNumber)
+            );
+
+        });
+
+
+    if (!student) {
+        return;
+    }
+
+
+    const confirmed =
+        confirm(
+            "Delete " +
+            student.name +
+            " (" +
+            student.studentNumber +
+            ")?"
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    students =
+        students.filter(function(item) {
+
+            return (
+                String(
+                    item.studentNumber
+                ) !==
+                String(studentNumber)
+            );
+
+        });
+
+
+    saveEditableStudents();
+
+    renderStudentManagement();
+
+    clearStudentForm();
+
+
+    showStudentManagementResult(
+        student.name +
+        " has been deleted.",
+        true
+    );
+
+}
+
+
+/* RENDER STUDENT MANAGEMENT */
+
+function renderStudentManagement() {
+
+    const list =
+        document.getElementById(
+            "studentManagementList"
+        );
+
+    const count =
+        document.getElementById(
+            "studentManagementCount"
+        );
+
+    const searchInput =
+        document.getElementById(
+            "studentManagementSearch"
+        );
+
+
+    if (
+        !list ||
+        !count ||
+        !searchInput
+    ) {
+
+        return;
+
+    }
+
+
+    const search =
+        searchInput.value
+            .trim()
+            .toLowerCase();
+
+
+    const filtered =
+        students
+            .filter(function(student) {
+
+                if (!search) {
+                    return true;
+                }
+
+                return (
+
+                    String(
+                        student.studentNumber
+                    )
+                    .toLowerCase()
+                    .includes(search)
+
+                    ||
+
+                    String(
+                        student.name
+                    )
+                    .toLowerCase()
+                    .includes(search)
+
+                );
+
+            })
+            .slice()
+            .sort(function(a, b) {
+
+                return a.name.localeCompare(
+                    b.name
+                );
+
+            });
+
+
+    count.textContent =
+        students.length +
+        (
+            students.length === 1
+                ? " student"
+                : " students"
+        );
+
+
+    list.innerHTML = "";
+
+
+    if (filtered.length === 0) {
+
+        list.innerHTML =
+            '<p class="empty">' +
+            'No students found.' +
+            '</p>';
+
+        return;
+
+    }
+
+
+    filtered.forEach(
+        function(student) {
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+            card.className =
+                "student-management-item";
+
+
+            const information =
+                document.createElement(
+                    "div"
+                );
+
+
+            const name =
+                document.createElement(
+                    "strong"
+                );
+
+            name.textContent =
+                student.name;
+
+
+            const details =
+                document.createElement(
+                    "div"
+                );
+
+            details.textContent =
+                student.studentNumber +
+                " · " +
+                student.year +
+                " · " +
+                student.section;
+
+
+            information.appendChild(
+                name
+            );
+
+            information.appendChild(
+                details
+            );
+
+
+            const actions =
+                document.createElement(
+                    "div"
+                );
+
+            actions.className =
+                "student-management-item-actions";
+
+
+            const editButton =
+                document.createElement(
+                    "button"
+                );
+
+            editButton.type =
+                "button";
+
+            editButton.textContent =
+                "Edit";
+
+            editButton.addEventListener(
+                "click",
+                function() {
+
+                    editManagedStudent(
+                        student.studentNumber
+                    );
+
+                }
+            );
+
+
+            const deleteButton =
+                document.createElement(
+                    "button"
+                );
+
+            deleteButton.type =
+                "button";
+
+            deleteButton.textContent =
+                "Delete";
+
+            deleteButton.addEventListener(
+                "click",
+                function() {
+
+                    deleteManagedStudent(
+                        student.studentNumber
+                    );
+
+                }
+            );
+
+
+            actions.appendChild(
+                editButton
+            );
+
+            actions.appendChild(
+                deleteButton
+            );
+
+
+            card.appendChild(
+                information
+            );
+
+            card.appendChild(
+                actions
+            );
+
+
+            list.appendChild(
+                card
+            );
+
+        }
+    );
+
+}
+
+
+/* STUDENT MANAGEMENT EVENTS */
+
+function initializeStudentManagement() {
+
+    loadEditableStudents();
+
+
+    const addButton =
+        document.getElementById(
+            "addStudentButton"
+        );
+
+    const updateButton =
+        document.getElementById(
+            "updateStudentButton"
+        );
+
+    const cancelButton =
+        document.getElementById(
+            "cancelStudentEditButton"
+        );
+
+    const searchInput =
+        document.getElementById(
+            "studentManagementSearch"
+        );
+
+
+    if (addButton) {
+
+        addButton.addEventListener(
+            "click",
+            addManagedStudent
+        );
+
+    }
+
+
+    if (updateButton) {
+
+        updateButton.addEventListener(
+            "click",
+            updateManagedStudent
+        );
+
+    }
+
+
+    if (cancelButton) {
+
+        cancelButton.addEventListener(
+            "click",
+            function() {
+
+                clearStudentForm();
+
+                showStudentManagementResult(
+                    "",
+                    true
+                );
+
+            }
+        );
+
+    }
+
+
+    if (searchInput) {
+
+        searchInput.addEventListener(
+            "input",
+            renderStudentManagement
+        );
+
+    }
+
+
+    renderStudentManagement();
+
+}
+
+
+/* START STUDENT MANAGEMENT */
+
+if (
+    document.readyState ===
+    "loading"
+) {
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        initializeStudentManagement
+    );
+
+} else {
+
+    initializeStudentManagement();
+
+}
 
 
 

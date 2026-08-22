@@ -1,101 +1,41 @@
+/*
+ * JNX OFFLINE ATTENDANCE
+ *
+ * STUDENT MANAGEMENT
+ *
+ * Students are stored in the same
+ * mayor/class-specific database used
+ * by the Attendance Checker.
+ */
+
+
 /* ============================================================
-   JNX STUDENT MANAGEMENT DASHBOARD
+   ORIGINAL MAYOR DATABASE
+   ============================================================ */
+
+function getStudentDatabaseKey() {
+
+    /*
+     * Student Management belongs to the
+     * original Mayor account.
+     */
+
+    return "jnx_student_database";
+
+}
+
+
+/* ============================================================
+   DATABASE
    ============================================================ */
 
 const STUDENT_DATABASE_KEY =
-    "jnx_student_database";
+    getStudentDatabaseKey();
 
 
 let students = [];
 
-let editingStudentNumber = null;
-
-
-/* ============================================================
-   CURRENT MAYOR / CLASS REGISTRATION
-   ============================================================ */
-
-function getStudentClassRegistration() {
-
-    try {
-
-        const saved =
-            localStorage.getItem(
-                "jnx_class_registration"
-            );
-
-
-        if (!saved) {
-
-            return null;
-
-        }
-
-
-        const registration =
-            JSON.parse(
-                saved
-            );
-
-
-        if (
-            !registration ||
-            !registration.classId
-        ) {
-
-            return null;
-
-        }
-
-
-        return registration;
-
-    } catch (error) {
-
-        console.error(
-            "Could not read class registration:",
-            error
-        );
-
-        return null;
-
-    }
-
-}
-
-
-/* ============================================================
-   GET STUDENT STORAGE KEY
-   ============================================================ */
-
-function getStudentStorageKey() {
-
-    const registration =
-        getStudentClassRegistration();
-
-    /*
-     * The Attendance Checker and Student Management
-     * MUST use exactly the same storage-key algorithm.
-     */
-
-    if (
-        registration &&
-        registration.classId
-    ) {
-
-        return (
-            STUDENT_DATABASE_BASE_KEY +
-            "_" +
-            String(
-                registration.classId
-            )
-        );
-
-    }
-
-    return STUDENT_DATABASE_BASE_KEY;
-
-}
+let editingStudentId = null;
 
 
 /* ============================================================
@@ -104,648 +44,117 @@ function getStudentStorageKey() {
 
 function loadStudents() {
 
-    const storageKey =
-        getStudentStorageKey();
+    try {
 
-
-    const registration =
-        getStudentClassRegistration();
-
-
-    const saved =
-        localStorage.getItem(
-            storageKey
-        );
-
-
-    /*
-     * If this mayor already has a student database,
-     * load it.
-     */
-
-    if (saved) {
-
-        try {
-
-            const parsed =
-                JSON.parse(
-                    saved
-                );
-
-
-            if (
-                Array.isArray(parsed)
-            ) {
-
-                students =
-                    parsed;
-
-                return;
-
-            }
-
-        } catch (error) {
-
-            console.error(
-                "Saved student database error:",
-                error
+        const saved =
+            localStorage.getItem(
+                STUDENT_DATABASE_KEY
             );
+
+
+        if (!saved) {
+
+            students = [];
+
+            return;
 
         }
 
+
+        const parsed =
+            JSON.parse(saved);
+
+
+        if (!Array.isArray(parsed)) {
+
+            students = [];
+
+            return;
+
+        }
+
+
+        /*
+         * Normalize the database so the
+         * Attendance Checker can use it.
+         */
+
+        students =
+            parsed
+                .map(function(student) {
+
+                    return {
+
+                        id:
+                            String(
+                                student.id ||
+                                Date.now() +
+                                Math.random()
+                            ),
+
+                        studentNumber:
+                            String(
+                                student.studentNumber ||
+                                student.number ||
+                                ""
+                            ).trim(),
+
+                        name:
+                            String(
+                                student.name ||
+                                ""
+                            ).trim(),
+
+                        year:
+                            String(
+                                student.year ||
+                                ""
+                            ).trim(),
+
+                        section:
+                            String(
+                                student.section ||
+                                ""
+                            ).trim()
+
+                    };
+
+                })
+                .filter(function(student) {
+
+                    return (
+                        student.studentNumber &&
+                        student.name
+                    );
+
+                });
+
+
     }
 
+    catch (error) {
 
-    /*
-     * NEW REGISTERED MAYOR
-     *
-     * A newly registered mayor must start with
-     * ZERO students.
-     *
-     * Do NOT copy STUDENTS from data/students.js.
-     */
-
-    if (
-        registration &&
-        registration.classId
-    ) {
+        console.error(
+            "Unable to load students:",
+            error
+        );
 
         students = [];
 
-        saveStudents();
-
-        return;
-
     }
-
-
-    /*
-     * ORIGINAL MAYOR
-     *
-     * Preserve the original student database and
-     * initialize it from data/students.js only when
-     * the original database does not exist yet.
-     */
-
-    if (
-        typeof STUDENTS !== "undefined" &&
-        Array.isArray(STUDENTS)
-    ) {
-
-        students =
-            STUDENTS.map(function(student) {
-
-                return {
-
-                    studentNumber:
-                        String(
-                            student.studentNumber
-                        ).trim(),
-
-                    name:
-                        String(
-                            student.name || ""
-                        ).trim(),
-
-                    year:
-                        String(
-                            student.year || ""
-                        ).trim(),
-
-                    section:
-                        String(
-                            student.section || ""
-                        ).trim()
-
-                };
-
-            });
-
-
-        saveStudents();
-
-        return;
-
-    }
-
-
-    students = [];
 
 }
 
 
 /* ============================================================
-   SAVE STUDENTS
+   SAVE
    ============================================================ */
 
 function saveStudents() {
 
-    const storageKey =
-        getStudentStorageKey();
-
-
-    try {
-
-        localStorage.setItem(
-
-            storageKey,
-
-            JSON.stringify(
-                students
-            )
-
-        );
-
-
-        /*
-         * Verify that the correct mayor-specific
-         * database was actually saved.
-         */
-
-        const verification =
-            localStorage.getItem(
-                storageKey
-            );
-
-
-        if (
-            verification === null
-        ) {
-
-            throw new Error(
-                "Student database could not be saved."
-            );
-
-        }
-
-    } catch (error) {
-
-        console.error(
-            "Could not save student database:",
-            error
-        );
-
-        showManagementResult(
-            "Could not save the student database.",
-            false
-        );
-
-    }
-
-}
-
-
-/* ============================================================
-   MESSAGE
-   ============================================================ */
-
-function showManagementResult(
-    message,
-    success
-) {
-
-    const result =
-        document.getElementById(
-            "studentManagementResult"
-        );
-
-
-    if (!result) {
-        return;
-    }
-
-
-    result.textContent =
-        message;
-
-
-    result.className =
-        success
-            ? "result success"
-            : "result error";
-
-}
-
-
-/* ============================================================
-   CLEAR FORM
-   ============================================================ */
-
-function clearStudentForm() {
-
-    document.getElementById(
-        "manageStudentNumber"
-    ).value = "";
-
-
-    document.getElementById(
-        "manageStudentName"
-    ).value = "";
-
-
-    document.getElementById(
-        "manageStudentYear"
-    ).value = "";
-
-
-    document.getElementById(
-        "manageStudentSection"
-    ).value = "";
-
-
-    editingStudentNumber =
-        null;
-
-}
-
-
-/* ============================================================
-   ADD
-   ============================================================ */
-
-function addStudent() {
-
-    const studentNumber =
-        document.getElementById(
-            "manageStudentNumber"
-        ).value.trim();
-
-
-    const name =
-        document.getElementById(
-            "manageStudentName"
-        ).value.trim();
-
-
-    const year =
-        document.getElementById(
-            "manageStudentYear"
-        ).value.trim();
-
-
-    const section =
-        document.getElementById(
-            "manageStudentSection"
-        ).value.trim();
-
-
-    if (
-        !studentNumber ||
-        !name ||
-        !year ||
-        !section
-    ) {
-
-        showManagementResult(
-            "Please complete all student fields.",
-            false
-        );
-
-        return;
-
-    }
-
-
-    const duplicate =
-        students.some(function(student) {
-
-            return (
-                String(
-                    student.studentNumber
-                ).trim() ===
-                studentNumber
-            );
-
-        });
-
-
-    if (duplicate) {
-
-        showManagementResult(
-            "That student number already exists.",
-            false
-        );
-
-        return;
-
-    }
-
-
-    students.push({
-
-        studentNumber:
-            studentNumber,
-
-        name:
-            name,
-
-        year:
-            year,
-
-        section:
-            section
-
-    });
-
-
-    saveStudents();
-
-    renderStudents();
-
-    clearStudentForm();
-
-
-    showManagementResult(
-        name +
-        " was added successfully.",
-        true
-    );
-
-}
-
-
-/* ============================================================
-   EDIT
-   ============================================================ */
-
-function editStudent(
-    studentNumber
-) {
-
-    const student =
-        students.find(function(item) {
-
-            return (
-                String(
-                    item.studentNumber
-                ) ===
-                String(studentNumber)
-            );
-
-        });
-
-
-    if (!student) {
-        return;
-    }
-
-
-    document.getElementById(
-        "manageStudentNumber"
-    ).value =
-        student.studentNumber;
-
-
-    document.getElementById(
-        "manageStudentName"
-    ).value =
-        student.name;
-
-
-    document.getElementById(
-        "manageStudentYear"
-    ).value =
-        student.year;
-
-
-    document.getElementById(
-        "manageStudentSection"
-    ).value =
-        student.section;
-
-
-    editingStudentNumber =
-        student.studentNumber;
-
-
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
-
-
-    showManagementResult(
-        "Editing " +
-        student.name +
-        ".",
-        true
-    );
-
-}
-
-
-/* ============================================================
-   UPDATE
-   ============================================================ */
-
-function updateStudent() {
-
-    if (!editingStudentNumber) {
-
-        showManagementResult(
-            "Select a student to edit first.",
-            false
-        );
-
-        return;
-
-    }
-
-
-    const studentNumber =
-        document.getElementById(
-            "manageStudentNumber"
-        ).value.trim();
-
-
-    const name =
-        document.getElementById(
-            "manageStudentName"
-        ).value.trim();
-
-
-    const year =
-        document.getElementById(
-            "manageStudentYear"
-        ).value.trim();
-
-
-    const section =
-        document.getElementById(
-            "manageStudentSection"
-        ).value.trim();
-
-
-    if (
-        !studentNumber ||
-        !name ||
-        !year ||
-        !section
-    ) {
-
-        showManagementResult(
-            "Please complete all student fields.",
-            false
-        );
-
-        return;
-
-    }
-
-
-    const duplicate =
-        students.some(function(student) {
-
-            return (
-                String(
-                    student.studentNumber
-                ) ===
-                studentNumber &&
-
-                String(
-                    student.studentNumber
-                ) !==
-                String(editingStudentNumber)
-            );
-
-        });
-
-
-    if (duplicate) {
-
-        showManagementResult(
-            "That student number already exists.",
-            false
-        );
-
-        return;
-
-    }
-
-
-    const index =
-        students.findIndex(function(student) {
-
-            return (
-                String(
-                    student.studentNumber
-                ) ===
-                String(editingStudentNumber)
-            );
-
-        });
-
-
-    if (index === -1) {
-
-        showManagementResult(
-            "Student could not be found.",
-            false
-        );
-
-        return;
-
-    }
-
-
-    students[index] = {
-
-        studentNumber:
-            studentNumber,
-
-        name:
-            name,
-
-        year:
-            year,
-
-        section:
-            section
-
-    };
-
-
-    saveStudents();
-
-    renderStudents();
-
-    clearStudentForm();
-
-
-    showManagementResult(
-        name +
-        " was updated successfully.",
-        true
-    );
-
-}
-
-
-/* ============================================================
-   DELETE
-   ============================================================ */
-
-function deleteStudent(
-    studentNumber
-) {
-
-    const student =
-        students.find(function(item) {
-
-            return (
-                String(
-                    item.studentNumber
-                ) ===
-                String(studentNumber)
-            );
-
-        });
-
-
-    if (!student) {
-        return;
-    }
-
-
-    const confirmed =
-        confirm(
-            "Delete " +
-            student.name +
-            " (" +
-            student.studentNumber +
-            ")?"
-        );
-
-
-    if (!confirmed) {
-        return;
-    }
-
-
-    students =
-        students.filter(function(item) {
-
-            return (
-                String(
-                    item.studentNumber
-                ) !==
-                String(studentNumber)
-            );
-
-        });
-
-
-    saveStudents();
-
-    renderStudents();
-
-    clearStudentForm();
-
-
-    showManagementResult(
-        student.name +
-        " was deleted.",
-        true
+    localStorage.setItem(
+        STUDENT_DATABASE_KEY,
+        JSON.stringify(students)
     );
 
 }
@@ -759,61 +168,42 @@ function renderStudents() {
 
     const list =
         document.getElementById(
-            "studentManagementList"
+            "studentList"
         );
-
 
     const count =
         document.getElementById(
-            "studentManagementCount"
+            "studentCount"
         );
-
 
     const search =
         document.getElementById(
-            "studentManagementSearch"
-        )
-            .value
+            "studentSearch"
+        );
+
+
+    const query =
+        search.value
             .trim()
             .toLowerCase();
 
 
     const filtered =
-        students
-            .filter(function(student) {
-
-                if (!search) {
-                    return true;
-                }
-
+        students.filter(
+            function(student) {
 
                 return (
-
-                    String(
-                        student.studentNumber
-                    )
-                    .toLowerCase()
-                    .includes(search)
-
+                    student.studentNumber
+                        .toLowerCase()
+                        .includes(query)
                     ||
-
-                    String(
-                        student.name
-                    )
-                    .toLowerCase()
-                    .includes(search)
-
+                    student.name
+                        .toLowerCase()
+                        .includes(query)
                 );
 
-            })
-            .slice()
-            .sort(function(a, b) {
-
-                return a.name.localeCompare(
-                    b.name
-                );
-
-            });
+            }
+        );
 
 
     count.textContent =
@@ -825,31 +215,31 @@ function renderStudents() {
         );
 
 
-    list.innerHTML = "";
-
-
     if (filtered.length === 0) {
 
         list.innerHTML =
-            '<p class="empty">' +
-            'No students found.' +
-            '</p>';
+            students.length === 0
+                ? "<p>No students added yet.</p>"
+                : "<p>No matching students found.</p>";
 
         return;
 
     }
 
 
+    list.innerHTML = "";
+
+
     filtered.forEach(
         function(student) {
 
-            const card =
+            const item =
                 document.createElement(
                     "div"
                 );
 
 
-            card.className =
+            item.className =
                 "student-management-item";
 
 
@@ -869,27 +259,22 @@ function renderStudents() {
                 student.name;
 
 
-            const details =
+            const number =
                 document.createElement(
-                    "div"
+                    "small"
                 );
 
 
-            details.textContent =
-                student.studentNumber +
-                " · " +
-                student.year +
-                " · " +
-                student.section;
+            number.textContent =
+                student.studentNumber;
 
 
             information.appendChild(
                 name
             );
 
-
             information.appendChild(
-                details
+                number
             );
 
 
@@ -917,16 +302,14 @@ function renderStudents() {
                 "Edit";
 
 
-            editButton.addEventListener(
-                "click",
+            editButton.onclick =
                 function() {
 
                     editStudent(
-                        student.studentNumber
+                        student.id
                     );
 
-                }
-            );
+                };
 
 
             const deleteButton =
@@ -943,40 +326,36 @@ function renderStudents() {
                 "Delete";
 
 
-            deleteButton.addEventListener(
-                "click",
+            deleteButton.onclick =
                 function() {
 
                     deleteStudent(
-                        student.studentNumber
+                        student.id
                     );
 
-                }
-            );
+                };
 
 
             actions.appendChild(
                 editButton
             );
 
-
             actions.appendChild(
                 deleteButton
             );
 
 
-            card.appendChild(
+            item.appendChild(
                 information
             );
 
-
-            card.appendChild(
+            item.appendChild(
                 actions
             );
 
 
             list.appendChild(
-                card
+                item
             );
 
         }
@@ -986,80 +365,316 @@ function renderStudents() {
 
 
 /* ============================================================
-   EVENTS
+   ADD / EDIT STUDENT
    ============================================================ */
 
-document.addEventListener(
-    "DOMContentLoaded",
-    function() {
+function handleStudentSubmit(event) {
 
-        loadStudents();
-
-        renderStudents();
+    event.preventDefault();
 
 
-        document
-            .getElementById(
-                "addStudentButton"
-            )
-            .addEventListener(
-                "click",
-                addStudent
-            );
+    const numberInput =
+        document.getElementById(
+            "studentNumber"
+        );
 
 
-        document
-            .getElementById(
-                "updateStudentButton"
-            )
-            .addEventListener(
-                "click",
-                updateStudent
-            );
+    const nameInput =
+        document.getElementById(
+            "studentName"
+        );
 
 
-        document
-            .getElementById(
-                "cancelStudentEditButton"
-            )
-            .addEventListener(
-                "click",
-                function() {
+    const number =
+        numberInput.value.trim();
 
-                    clearStudentForm();
 
-                    showManagementResult(
-                        "",
-                        true
+    const name =
+        nameInput.value.trim();
+
+
+    if (
+        !number ||
+        !name
+    ) {
+
+        return;
+
+    }
+
+
+    /*
+     * Prevent duplicate student numbers.
+     */
+
+    const duplicate =
+        students.find(
+            function(student) {
+
+                return (
+                    student.studentNumber
+                        .toLowerCase() ===
+                    number.toLowerCase()
+                    &&
+                    student.id !==
+                    editingStudentId
+                );
+
+            }
+        );
+
+
+    if (duplicate) {
+
+        alert(
+            "That student number already exists."
+        );
+
+        return;
+
+    }
+
+
+    if (editingStudentId) {
+
+        const student =
+            students.find(
+                function(item) {
+
+                    return (
+                        item.id ===
+                        editingStudentId
                     );
 
                 }
             );
 
 
-        document
-            .getElementById(
-                "studentManagementSearch"
-            )
-            .addEventListener(
-                "input",
-                renderStudents
-            );
+        if (student) {
 
+            student.studentNumber =
+                number;
 
-        document
-            .getElementById(
-                "backToAttendanceButton"
-            )
-            .addEventListener(
-                "click",
-                function() {
+            student.name =
+                name;
 
-                    window.location.href =
-                        "attendance.html";
-
-                }
-            );
+        }
 
     }
-);
+
+    else {
+
+        students.push({
+
+            id:
+                Date.now().toString(),
+
+            studentNumber:
+                number,
+
+            name:
+                name,
+
+            year:
+                "",
+
+            section:
+                ""
+
+        });
+
+    }
+
+
+    saveStudents();
+
+    resetStudentForm();
+
+    renderStudents();
+
+}
+
+
+/* ============================================================
+   EDIT
+   ============================================================ */
+
+function editStudent(id) {
+
+    const student =
+        students.find(
+            function(item) {
+
+                return item.id === id;
+
+            }
+        );
+
+
+    if (!student) {
+
+        return;
+
+    }
+
+
+    editingStudentId =
+        id;
+
+
+    document.getElementById(
+        "studentNumber"
+    ).value =
+        student.studentNumber;
+
+
+    document.getElementById(
+        "studentName"
+    ).value =
+        student.name;
+
+
+    document.getElementById(
+        "saveStudentButton"
+    ).textContent =
+        "Save Changes";
+
+
+    document.getElementById(
+        "cancelStudentButton"
+    ).hidden =
+        false;
+
+
+    document.getElementById(
+        "studentNumber"
+    ).focus();
+
+}
+
+
+/* ============================================================
+   DELETE
+   ============================================================ */
+
+function deleteStudent(id) {
+
+    const student =
+        students.find(
+            function(item) {
+
+                return item.id === id;
+
+            }
+        );
+
+
+    if (!student) {
+
+        return;
+
+    }
+
+
+    const confirmed =
+        confirm(
+            "Remove " +
+            student.name +
+            " from the class list?"
+        );
+
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+
+    students =
+        students.filter(
+            function(item) {
+
+                return item.id !== id;
+
+            }
+        );
+
+
+    saveStudents();
+
+    renderStudents();
+
+}
+
+
+/* ============================================================
+   RESET FORM
+   ============================================================ */
+
+function resetStudentForm() {
+
+    editingStudentId =
+        null;
+
+
+    document.getElementById(
+        "studentForm"
+    ).reset();
+
+
+    document.getElementById(
+        "saveStudentButton"
+    ).textContent =
+        "Add Student";
+
+
+    document.getElementById(
+        "cancelStudentButton"
+    ).hidden =
+        true;
+
+}
+
+
+/* ============================================================
+   EVENTS
+   ============================================================ */
+
+document
+    .getElementById(
+        "studentForm"
+    )
+    .addEventListener(
+        "submit",
+        handleStudentSubmit
+    );
+
+
+document
+    .getElementById(
+        "cancelStudentButton"
+    )
+    .addEventListener(
+        "click",
+        resetStudentForm
+    );
+
+
+document
+    .getElementById(
+        "studentSearch"
+    )
+    .addEventListener(
+        "input",
+        renderStudents
+    );
+
+
+/* ============================================================
+   START
+   ============================================================ */
+
+loadStudents();
+
+renderStudents();
