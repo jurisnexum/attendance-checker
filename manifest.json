@@ -1,10 +1,23 @@
 {
-  "name": "JNX Offline Attendance Checker",
-  "short_name": "JNX Attendance",
-  "description": "Offline Student Attendance System",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#ffffff",
-  "theme_color": "#4b0082"
+    "name": "Juris Nexum Attendance",
+    "short_name": "JNX Attendance",
+    "description": "Offline Attendance System for Juris Nexum",
+    "start_url": "./index.html",
+    "scope": "./",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#ffffff",
+    "theme_color": "#4b0082",
+    "icons": [
+        {
+            "src": "icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
 }
