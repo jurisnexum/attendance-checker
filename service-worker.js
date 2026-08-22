@@ -1,4 +1,4 @@
-const CACHE_NAME = "jnx-attendance-v7";
+const CACHE_NAME = "jnx-attendance-v8";
 
 const FILES_TO_CACHE = [
     "./",
