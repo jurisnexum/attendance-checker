@@ -278,6 +278,24 @@ function renderStudents() {
             );
 
 
+            const yearSection =
+                document.createElement(
+                    "small"
+                );
+
+
+            yearSection.textContent =
+                "Year " +
+                (student.year || "—") +
+                " • Section " +
+                (student.section || "—");
+
+
+            information.appendChild(
+                yearSection
+            );
+
+
             const actions =
                 document.createElement(
                     "div"
@@ -385,6 +403,18 @@ function handleStudentSubmit(event) {
         );
 
 
+    const yearInput =
+        document.getElementById(
+            "studentYear"
+        );
+
+
+    const sectionInput =
+        document.getElementById(
+            "studentSection"
+        );
+
+
     const number =
         numberInput.value.trim();
 
@@ -393,9 +423,19 @@ function handleStudentSubmit(event) {
         nameInput.value.trim();
 
 
+    const year =
+        yearInput.value.trim();
+
+
+    const section =
+        sectionInput.value.trim();
+
+
     if (
         !number ||
-        !name
+        !name ||
+        !year ||
+        !section
     ) {
 
         return;
@@ -458,6 +498,12 @@ function handleStudentSubmit(event) {
             student.name =
                 name;
 
+            student.year =
+                year;
+
+            student.section =
+                section;
+
         }
 
     }
@@ -476,10 +522,10 @@ function handleStudentSubmit(event) {
                 name,
 
             year:
-                "",
+                year,
 
             section:
-                ""
+                section
 
         });
 
@@ -532,6 +578,18 @@ function editStudent(id) {
         "studentName"
     ).value =
         student.name;
+
+
+    document.getElementById(
+        "studentYear"
+    ).value =
+        student.year || "";
+
+
+    document.getElementById(
+        "studentSection"
+    ).value =
+        student.section || "";
 
 
     document.getElementById(
